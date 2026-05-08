@@ -41,11 +41,11 @@ function calcDRIP(
 }
 
 const inputs = [
-  { id: "budget",    label: "Monthly budget",    unit: "CHF", min: 10,   max: 10000, step: 50,  default: "500"  },
-  { id: "price",     label: "Stock price",        unit: "CHF", min: 1,    max: 5000,  step: 1,   default: "50"   },
-  { id: "divAnnual", label: "Dividend / share / yr", unit: "CHF", min: 0.01, max: 50, step: 0.1, default: "2.50" },
-  { id: "growth",    label: "Annual price return",unit: "%",   min: 0,    max: 20,    step: 0.5, default: "3"    },
-  { id: "years",     label: "Time horizon",       unit: "yrs", min: 1,    max: 40,    step: 1,   default: "20"   },
+  { id: "budget",    label: "Monthly budget",         unit: "CHF", min: 10,   max: 10000, step: 50,  default: "500"  },
+  { id: "price",     label: "Stock price",             unit: "CHF", min: 1,    max: 5000,  step: 1,   default: "50"   },
+  { id: "divAnnual", label: "Dividend / share / yr",   unit: "CHF", min: 0.01, max: 50,    step: 0.1, default: "2.50" },
+  { id: "growth",    label: "Annual price return",     unit: "%",   min: 0,    max: 20,    step: 0.5, default: "3"    },
+  { id: "years",     label: "Time horizon",            unit: "yrs", min: 1,    max: 40,    step: 1,   default: "20"   },
 ];
 
 export default function SimulatorPage() {
@@ -76,55 +76,76 @@ export default function SimulatorPage() {
       <SiteHeader />
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 space-y-8">
+
+        {/* Heading */}
         <div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground tracking-tight">
+          <h1 className="font-display font-bold text-3xl sm:text-4xl text-foreground tracking-tight">
             Savings Plan Simulator
           </h1>
-          <p className="text-sm text-muted-foreground mt-1.5 max-w-lg">
+          <p className="text-sm text-muted-foreground mt-2 max-w-lg">
             Project your portfolio value with Dividend Reinvestment (DRIP) over up to 40 years.
           </p>
         </div>
 
-        {/* Inputs */}
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {inputs.map(({ id, label, unit, min, max, step }) => (
-              <div key={id} className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground block">
-                  {label}
-                  <span className="ml-1 text-muted-foreground/50">{unit}</span>
-                </label>
-                <input
-                  type="number"
-                  min={min}
-                  max={max}
-                  step={step}
-                  value={vals[id]}
-                  onChange={(e) => setVals((v) => ({ ...v, [id]: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground font-data text-sm focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary/50 transition-colors"
-                />
-              </div>
-            ))}
+        {/* ── Side-by-side: Inputs | Results ─────────── */}
+        <div className="grid lg:grid-cols-[1fr_260px] gap-5 items-start">
+
+          {/* Left: parameters */}
+          <div className="rounded-xl border border-border bg-card shadow-sm">
+            <div className="px-5 py-4 border-b border-border">
+              <h2 className="text-sm font-semibold text-foreground">Parameters</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Adjust the inputs to model your scenario.</p>
+            </div>
+            <div className="p-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {inputs.map(({ id, label, unit, min, max, step }) => (
+                <div key={id} className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground block">
+                    {label}
+                    <span className="ml-1 text-muted-foreground/50">{unit}</span>
+                  </label>
+                  <input
+                    type="number"
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={vals[id]}
+                    onChange={(e) => setVals((v) => ({ ...v, [id]: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground font-data text-sm focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary/50 transition-colors"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: projections — tall card, stacked results */}
+          <div className="rounded-xl border border-border bg-card shadow-sm">
+            <div className="px-5 py-4 border-b border-border">
+              <h2 className="text-sm font-semibold text-foreground">Projections</h2>
+            </div>
+            <div className="px-5 divide-y divide-border">
+              {results.map(({ label, value, color, icon: Icon }) => (
+                <div key={label} className="py-4">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                    <Icon className={`w-3 h-3 ${color}`} />
+                    {label}
+                  </div>
+                  <div className={`font-data text-2xl font-bold ${color}`}>{value}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Results */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {results.map(({ label, value, color, icon: Icon }) => (
-            <div key={label} className="rounded-xl border border-border bg-card p-5 shadow-sm">
-              <Icon className={`w-4 h-4 mb-3 ${color}`} />
-              <div className={`text-2xl font-data font-bold leading-none ${color}`}>{value}</div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-2 leading-tight">{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Chart */}
-        <div className="rounded-xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold text-foreground mb-4">
-            Portfolio growth over {vals.years} years
-          </h2>
-          <SimulatorChart data={data} />
+        {/* ── Full-width chart ───────────────────────── */}
+        <div className="rounded-xl border border-border bg-card shadow-sm">
+          <div className="px-5 py-4 border-b border-border">
+            <h2 className="text-sm font-semibold text-foreground">
+              Portfolio growth over {vals.years} years
+            </h2>
+          </div>
+          <div className="p-5">
+            <SimulatorChart data={data} />
+          </div>
         </div>
 
         <p className="text-xs text-muted-foreground border-t border-border pt-6">

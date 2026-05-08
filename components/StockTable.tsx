@@ -5,31 +5,25 @@ import { SustainabilityBadge } from "./SustainabilityBadge";
 import { ArrowUpDown } from "lucide-react";
 import type { Stock } from "@/types/stock";
 
-function fmt(v: number | null, decimals = 2, suffix = "") {
+function fmt(v: number | null, d = 2, s = "") {
   if (v === null) return "—";
-  return `${v.toFixed(decimals)}${suffix}`;
+  return `${v.toFixed(d)}${s}`;
 }
-
-function fmtPrice(price: number | null, currency: string) {
-  if (price === null) return "—";
-  return new Intl.NumberFormat("de-CH", {
-    style: "currency", currency,
-    minimumFractionDigits: 2, maximumFractionDigits: 2,
-  }).format(price);
+function fmtPrice(p: number | null, c: string) {
+  if (p === null) return "—";
+  return new Intl.NumberFormat("de-CH", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(p);
 }
-
 function yieldColor(y: number | null) {
   if (y === null) return "text-muted-foreground";
   if (y >= 4) return "text-emerald-700";
   if (y >= 2) return "text-blue-600";
   return "text-muted-foreground";
 }
-
-function yieldDot(y: number | null) {
-  if (y === null) return "bg-muted-foreground/25";
-  if (y >= 4) return "bg-emerald-600";
-  if (y >= 2) return "bg-blue-500";
-  return "bg-muted-foreground/25";
+function yieldBarColor(y: number | null) {
+  if (y === null || y <= 0) return "bg-muted-foreground/20";
+  if (y >= 4) return "bg-emerald-500";
+  if (y >= 2) return "bg-blue-400";
+  return "bg-muted-foreground/30";
 }
 
 const regions = [
@@ -53,7 +47,7 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
 
   return (
     <div className="space-y-3">
-      {/* Filters */}
+      {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-1 p-1 rounded-lg bg-muted border border-border">
           {regions.map((r) => (
@@ -70,74 +64,100 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
             </button>
           ))}
         </div>
-
         <button
           onClick={() => setSort(sort === "dividendYield" ? "price" : "dividendYield")}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowUpDown className="w-3 h-3" />
-          {sort === "dividendYield" ? "By Yield" : "By Price"}
+          {sort === "dividendYield" ? "Sorted by Yield" : "Sorted by Price"}
         </button>
-
-        <span className="ml-auto text-xs text-muted-foreground font-data">
-          {filtered.length} results
-        </span>
+        <span className="ml-auto text-xs text-muted-foreground font-data">{filtered.length} stocks</span>
       </div>
 
       {/* Table */}
       <div className="rounded-xl border border-border overflow-hidden shadow-sm">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border bg-muted/60">
-              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-24">Ticker</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Price</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Div./Year</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Yield</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Payout</th>
-              <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Sust.</th>
+            <tr className="border-b-2 border-border">
+              {/* Rank */}
+              <th className="bg-muted/60 px-3 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider w-10">#</th>
+              {/* Company */}
+              <th className="bg-muted/60 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Company</th>
+              {/* Price */}
+              <th className="bg-muted/60 px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Price</th>
+              {/* Div/Year — yield group, tinted green */}
+              <th className="bg-emerald-50 border-l-2 border-emerald-200 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider hidden sm:table-cell">Div./Year</th>
+              {/* Yield — yield group, primary highlight */}
+              <th className="bg-emerald-50 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider">Yield</th>
+              {/* Payout */}
+              <th className="bg-muted/60 border-l border-border px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Payout</th>
+              {/* Sustainability */}
+              <th className="bg-muted/60 px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Sust.</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-muted-foreground py-16 text-sm">
-                  No stocks found.
-                </td>
+                <td colSpan={7} className="text-center text-muted-foreground py-16 text-sm">No stocks found.</td>
               </tr>
             )}
-            {filtered.map((s) => (
+            {filtered.map((s, i) => (
               <tr
                 key={s.id}
-                className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors"
+                className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors group"
               >
+                {/* Rank */}
+                <td className="px-3 py-4 text-center">
+                  <span className="font-data text-xs font-semibold text-muted-foreground/40">{i + 1}</span>
+                </td>
+
+                {/* Company: name (primary link) + ticker chip */}
                 <td className="px-4 py-4">
                   <Link
                     href={`/stock/${encodeURIComponent(s.ticker)}`}
-                    className="font-data font-bold text-sm text-primary hover:underline underline-offset-2 transition-colors"
+                    className="font-semibold text-sm text-foreground hover:text-primary transition-colors"
                   >
-                    {s.ticker}
+                    {s.name}
                   </Link>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <code className="font-data text-xs bg-muted border border-border/60 px-1.5 py-0.5 rounded text-muted-foreground">
+                      {s.ticker}
+                    </code>
+                    <span className="text-xs text-muted-foreground/40">{s.exchange} · {s.region}</span>
+                  </div>
                 </td>
-                <td className="px-4 py-4">
-                  <div className="font-medium text-sm text-foreground leading-tight">{s.name}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{s.exchange} · {s.region}</div>
-                </td>
-                <td className="px-4 py-4 text-right font-data text-sm font-medium text-foreground">
+
+                {/* Price */}
+                <td className="px-4 py-4 text-right font-data text-sm font-medium text-foreground whitespace-nowrap">
                   {fmtPrice(s.currentPrice, s.currency)}
                 </td>
-                <td className="px-4 py-4 text-right font-data text-sm text-muted-foreground hidden sm:table-cell">
+
+                {/* Div/Year — yield group tint */}
+                <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 border-l-2 border-emerald-100 px-4 py-4 text-right font-data text-sm text-muted-foreground hidden sm:table-cell transition-colors">
                   {s.annualDividend ? fmtPrice(s.annualDividend, s.currency) : "—"}
                 </td>
-                <td className="px-4 py-4 text-right">
-                  <span className={`inline-flex items-center gap-1.5 font-data font-semibold text-sm ${yieldColor(s.dividendYield)}`}>
-                    {s.dividendYield !== null ? `${s.dividendYield.toFixed(2)}%` : "—"}
-                    <span className={`w-1 h-3.5 rounded-full shrink-0 ${yieldDot(s.dividendYield)}`} />
-                  </span>
+
+                {/* Yield — with mini progress bar */}
+                <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 px-4 py-4 transition-colors">
+                  <div className="flex flex-col items-end gap-1.5">
+                    <span className={`font-data font-bold text-sm ${yieldColor(s.dividendYield)}`}>
+                      {s.dividendYield !== null ? `${s.dividendYield.toFixed(2)}%` : "—"}
+                    </span>
+                    <div className="w-16 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${yieldBarColor(s.dividendYield)}`}
+                        style={{ width: `${Math.min(((s.dividendYield ?? 0) / 10) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
                 </td>
-                <td className="px-4 py-4 text-right font-data text-sm text-muted-foreground hidden md:table-cell">
+
+                {/* Payout */}
+                <td className="border-l border-border/40 px-4 py-4 text-right font-data text-sm text-muted-foreground hidden md:table-cell">
                   {fmt(s.payoutRatio, 1, "%")}
                 </td>
+
+                {/* Sustainability */}
                 <td className="px-4 py-4 hidden lg:table-cell">
                   <SustainabilityBadge status={s.sustainabilityStatus as never} />
                 </td>
