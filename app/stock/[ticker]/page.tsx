@@ -3,10 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SustainabilityBadge } from "@/components/SustainabilityBadge";
 import { Badge } from "@/components/ui/badge";
-import {
-  DollarSign, Percent, BarChart2, Scale,
-  TrendingUp, ShieldCheck, Globe, Building2, CalendarDays,
-} from "lucide-react";
+import { DollarSign, Percent, BarChart2, Scale, TrendingUp, ShieldCheck, Globe, Building2, CalendarDays } from "lucide-react";
 import type { Stock } from "@/types/stock";
 
 export const dynamic = "force-dynamic";
@@ -23,9 +20,9 @@ function fmtPrice(price: number | null, currency: string) {
 }
 function fmtMarketCap(mc: number | null) {
   if (!mc) return "—";
-  if (mc >= 1e12) return `${(mc / 1e12).toFixed(1)} Bio.`;
-  if (mc >= 1e9)  return `${(mc / 1e9).toFixed(1)} Mrd.`;
-  return `${(mc / 1e6).toFixed(0)} Mio.`;
+  if (mc >= 1e12) return `${(mc / 1e12).toFixed(1)}T`;
+  if (mc >= 1e9)  return `${(mc / 1e9).toFixed(1)}B`;
+  return `${(mc / 1e6).toFixed(0)}M`;
 }
 
 export default async function StockDetailPage({
@@ -44,39 +41,39 @@ export default async function StockDetailPage({
   if (!stock) notFound();
 
   const metrics = [
-    { label: "Aktueller Kurs",     value: fmtPrice(stock.currentPrice, stock.currency),                          icon: DollarSign,  accent: false },
-    { label: "Dividende / Jahr",   value: stock.annualDividend ? fmtPrice(stock.annualDividend, stock.currency) : "—", icon: TrendingUp,  accent: false },
-    { label: "Dividendenrendite",  value: fmt(stock.dividendYield, 2, "%"),                                       icon: Percent,     accent: true  },
-    { label: "Payout Ratio",       value: fmt(stock.payoutRatio, 1, "%"),                                         icon: BarChart2,   accent: false },
-    { label: "KGV (P/E)",          value: fmt(stock.peRatio, 1),                                                  icon: Scale,       accent: false },
-    { label: "Beta",               value: fmt(stock.beta, 2),                                                     icon: ShieldCheck, accent: false },
-    { label: "Market Cap",         value: fmtMarketCap(stock.marketCap),                                          icon: Building2,   accent: false },
-    { label: "Verschuldung (D/E)", value: fmt(stock.debtToEquity, 2),                                             icon: BarChart2,   accent: false },
+    { label: "Current Price",    value: fmtPrice(stock.currentPrice, stock.currency),                               icon: DollarSign,  highlight: false },
+    { label: "Annual Dividend",  value: stock.annualDividend ? fmtPrice(stock.annualDividend, stock.currency) : "—", icon: TrendingUp,  highlight: false },
+    { label: "Dividend Yield",   value: fmt(stock.dividendYield, 2, "%"),                                            icon: Percent,     highlight: true  },
+    { label: "Payout Ratio",     value: fmt(stock.payoutRatio, 1, "%"),                                              icon: BarChart2,   highlight: false },
+    { label: "P/E Ratio",        value: fmt(stock.peRatio, 1),                                                       icon: Scale,       highlight: false },
+    { label: "Beta",             value: fmt(stock.beta, 2),                                                          icon: ShieldCheck, highlight: false },
+    { label: "Market Cap",       value: fmtMarketCap(stock.marketCap),                                               icon: Building2,   highlight: false },
+    { label: "Debt / Equity",    value: fmt(stock.debtToEquity, 2),                                                  icon: BarChart2,   highlight: false },
   ];
 
   const taxInfo: Record<string, { title: string; items: string[] }> = {
     CH: {
-      title: "Schweizer Aktie",
+      title: "Swiss Stock",
       items: [
-        "Verrechnungssteuer: 35% automatisch abgezogen.",
-        "Vollständige Rückforderung via Steuererklärung (Formular 86).",
-        "Aktien müssen am Ex-Datum im Depot sein — nicht vorher verkaufen.",
+        "Withholding tax (Verrechnungssteuer): 35% deducted automatically.",
+        "Full refund available via your Swiss tax return (Form 86).",
+        "Shares must be in your account on the ex-date — don't sell before it.",
       ],
     },
     US: {
-      title: "US-amerikanische Aktie",
+      title: "US Stock",
       items: [
-        "Quellensteuer USA: 15% für CH-Ansässige (DBA).",
-        "Wird direkt vom Broker abgezogen.",
-        "Nur teilweise anrechenbar — faktische Belastung ~15%.",
+        "US withholding tax: 15% for Swiss residents under the tax treaty (DBA).",
+        "Deducted directly by your broker.",
+        "Only partially creditable — effective burden remains ~15%.",
       ],
     },
     EU: {
-      title: "Europäische Aktie",
+      title: "European Stock",
       items: [
-        "Quellensteuer je nach Land: 15–26.375%.",
-        "Teilweise rückforderbar via DBA.",
-        "Aufwand oft höher als Steuerersparnis bei kleinen Beträgen.",
+        "Withholding tax varies by country: 15–26.375% (e.g. Germany: 26.375%, France: 28%).",
+        "Partially recoverable under tax treaties.",
+        "Recovery effort often exceeds the tax saving for small amounts.",
       ],
     },
   };
@@ -89,33 +86,33 @@ export default async function StockDetailPage({
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 space-y-8">
 
         {/* Hero */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6">
+        <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <Badge variant="outline" className="font-data font-bold border-primary/25 text-primary bg-primary/[0.07] text-sm px-2.5">
+              <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                <Badge variant="outline" className="font-data font-bold border-primary/25 text-primary bg-primary/[0.07]">
                   {stock.ticker}
                 </Badge>
-                <Badge variant="outline" className="border-white/12 text-muted-foreground text-xs">{stock.exchange}</Badge>
+                <Badge variant="outline" className="border-border text-muted-foreground text-xs">{stock.exchange}</Badge>
                 {stock.region && (
-                  <Badge variant="outline" className="border-white/12 text-muted-foreground text-xs flex items-center gap-1">
+                  <Badge variant="outline" className="border-border text-muted-foreground text-xs flex items-center gap-1">
                     <Globe className="w-2.5 h-2.5" />{stock.region}
                   </Badge>
                 )}
                 {stock.sector && (
-                  <Badge variant="secondary" className="text-xs bg-white/5 border-white/8">{stock.sector}</Badge>
+                  <Badge variant="secondary" className="text-xs">{stock.sector}</Badge>
                 )}
               </div>
-              <h1 className="font-display font-bold text-2xl text-foreground">{stock.name}</h1>
+              <h1 className="font-display font-bold text-xl text-foreground">{stock.name}</h1>
             </div>
 
             <div className="text-right">
-              <div className="font-data font-bold text-3xl text-foreground">
+              <div className="font-data font-bold text-2xl text-foreground">
                 {fmtPrice(stock.currentPrice, stock.currency)}
               </div>
-              {stock.dividendYield && (
-                <div className="font-data font-semibold text-xl text-primary mt-1">
-                  {fmt(stock.dividendYield, 2, "% Rendite")}
+              {stock.dividendYield !== null && (
+                <div className="font-data font-semibold text-lg text-emerald-400 mt-0.5">
+                  {fmt(stock.dividendYield, 2, "% yield")}
                 </div>
               )}
               <div className="mt-2">
@@ -127,17 +124,13 @@ export default async function StockDetailPage({
 
         {/* Metrics */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {metrics.map(({ label, value, icon: Icon, accent }) => (
+          {metrics.map(({ label, value, icon: Icon, highlight }) => (
             <div
               key={label}
-              className={`rounded-xl border p-4 ${
-                accent
-                  ? "border-primary/25 bg-primary/[0.05] glow-green-sm"
-                  : "border-white/8 bg-white/[0.02]"
-              }`}
+              className="rounded-xl border border-border bg-card p-4"
             >
-              <Icon className={`w-4 h-4 mb-2 ${accent ? "text-primary" : "text-muted-foreground"}`} />
-              <div className={`font-data text-xl font-bold ${accent ? "text-primary" : "text-foreground"}`}>
+              <Icon className={`w-4 h-4 mb-2 ${highlight ? "text-emerald-400" : "text-muted-foreground"}`} />
+              <div className={`font-data text-lg font-bold ${highlight ? "text-emerald-400" : "text-foreground"}`}>
                 {value}
               </div>
               <div className="text-xs text-muted-foreground mt-1">{label}</div>
@@ -145,39 +138,43 @@ export default async function StockDetailPage({
           ))}
         </div>
 
-        {/* Sustainability details */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6">
-          <h2 className="font-display font-semibold text-base text-foreground mb-4">Dividenden-Nachhaltigkeit</h2>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-muted-foreground">Status</span>
-            <SustainabilityBadge status={stock.sustainabilityStatus as never} />
+        {/* Sustainability */}
+        <div className="rounded-xl border border-border bg-card">
+          <div className="px-5 py-3 border-b border-border">
+            <h2 className="text-sm font-semibold text-foreground">Dividend Sustainability</h2>
           </div>
-          <div className="rounded-xl bg-white/[0.02] border border-white/6 p-4 space-y-2">
-            {[
-              { dot: "bg-emerald-400", status: "Nachhaltig",  desc: "Payout Ratio < 60% und Dividendenwachstum > 0%" },
-              { dot: "bg-amber-400",   status: "Prüfen",      desc: "Payout Ratio 60–85% oder stagnierende Dividende" },
-              { dot: "bg-red-400",     status: "Gefährdet",   desc: "Payout Ratio > 85% oder Dividendenkürzung" },
-            ].map(({ dot, status, desc }) => (
-              <div key={status} className="flex items-start gap-3 text-xs">
-                <span className={`w-1.5 h-1.5 rounded-full mt-1 shrink-0 ${dot}`} />
-                <span className="font-medium text-foreground w-20 shrink-0">{status}</span>
-                <span className="text-muted-foreground">{desc}</span>
-              </div>
-            ))}
+          <div className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Status</span>
+              <SustainabilityBadge status={stock.sustainabilityStatus as never} />
+            </div>
+            <div className="rounded-lg bg-muted/50 border border-border/60 p-4 space-y-2">
+              {[
+                { dot: "bg-emerald-400", status: "Sustainable", desc: "Payout ratio < 60% with positive dividend growth" },
+                { dot: "bg-amber-400",   status: "Review",      desc: "Payout ratio 60–85% or stagnant dividend" },
+                { dot: "bg-red-400",     status: "At Risk",     desc: "Payout ratio > 85% or dividend cut" },
+              ].map(({ dot, status, desc }) => (
+                <div key={status} className="flex items-start gap-3 text-xs">
+                  <span className={`w-1.5 h-1.5 rounded-full mt-0.5 shrink-0 ${dot}`} />
+                  <span className="font-medium text-foreground w-20 shrink-0">{status}</span>
+                  <span className="text-muted-foreground">{desc}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Tax info */}
+        {/* Tax guidance */}
         {tax && (
-          <div className="rounded-2xl border border-sky-400/15 bg-sky-400/[0.03] p-6">
-            <h2 className="font-display font-semibold text-base text-sky-400 mb-3 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4" />
-              Steuerliche Hinweise — {tax.title}
-            </h2>
-            <ul className="space-y-2">
+          <div className="rounded-xl border border-border bg-card">
+            <div className="px-5 py-3 border-b border-border flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Tax Guidance for Swiss Investors — {tax.title}</h2>
+            </div>
+            <ul className="p-5 space-y-2">
               {tax.items.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-sky-400/70">
-                  <span className="w-1 h-1 rounded-full bg-sky-400/50 mt-2 shrink-0" />
+                <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground/50 mt-2 shrink-0" />
                   {item}
                 </li>
               ))}
@@ -187,30 +184,23 @@ export default async function StockDetailPage({
 
         {/* Dividend history */}
         {stock.dividends.length > 0 && (
-          <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6">
-            <h2 className="font-display font-semibold text-base text-foreground mb-4 flex items-center gap-2">
+          <div className="rounded-xl border border-border bg-card">
+            <div className="px-5 py-3 border-b border-border flex items-center gap-2">
               <CalendarDays className="w-4 h-4 text-muted-foreground" />
-              Dividendenhistorie
-            </h2>
-            <div className="space-y-1">
+              <h2 className="text-sm font-semibold text-foreground">Dividend History</h2>
+            </div>
+            <div className="divide-y divide-border/50">
               {stock.dividends.map((d, i) => (
-                <div
-                  key={d.id}
-                  className={`flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-white/[0.03] ${
-                    i < stock.dividends.length - 1 ? "border-b border-white/[0.04]" : ""
-                  }`}
-                >
+                <div key={d.id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/30 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className={`w-1.5 h-1.5 rounded-full ${i === 0 ? "bg-primary" : "bg-white/20"}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${i === 0 ? "bg-emerald-400" : "bg-border"}`} />
                     <span className="font-data text-sm text-muted-foreground">
-                      {new Date(d.exDate).toLocaleDateString("de-CH")}
+                      {new Date(d.exDate).toLocaleDateString("en-CH")}
                     </span>
-                    <span className="text-xs text-muted-foreground/60 hidden sm:inline">{d.frequency}</span>
+                    <span className="text-xs text-muted-foreground/50 hidden sm:inline">{d.frequency}</span>
                   </div>
                   <span className="font-data font-semibold text-sm text-foreground">
-                    {new Intl.NumberFormat("de-CH", {
-                      style: "currency", currency: d.currency,
-                    }).format(d.amount)}
+                    {new Intl.NumberFormat("de-CH", { style: "currency", currency: d.currency }).format(d.amount)}
                   </span>
                 </div>
               ))}
@@ -219,9 +209,9 @@ export default async function StockDetailPage({
         )}
       </main>
 
-      <footer className="border-t border-white/[0.06] py-6 mt-auto">
+      <footer className="border-t border-border py-5 mt-auto">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center text-xs text-muted-foreground">
-          DividendWatch · Open Source (MIT) · Daten via Yahoo Finance · Keine Anlageberatung
+          DividendWatch · Open Source (MIT) · Data via Yahoo Finance · Not investment advice
         </div>
       </footer>
     </div>

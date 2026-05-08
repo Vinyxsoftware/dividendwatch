@@ -41,11 +41,11 @@ function calcDRIP(
 }
 
 const inputs = [
-  { id: "budget",   label: "Monatliches Budget",   unit: "CHF", min: 10,   max: 10000, step: 50,  default: "500"  },
-  { id: "price",    label: "Aktienkurs",            unit: "CHF", min: 1,    max: 5000,  step: 1,   default: "50"   },
-  { id: "divAnnual",label: "Dividende / Aktie / J", unit: "CHF", min: 0.01, max: 50,    step: 0.1, default: "2.50" },
-  { id: "growth",   label: "Kursrendite / Jahr",    unit: "%",   min: 0,    max: 20,    step: 0.5, default: "3"    },
-  { id: "years",    label: "Anlagezeitraum",        unit: "J",   min: 1,    max: 40,    step: 1,   default: "20"   },
+  { id: "budget",    label: "Monthly budget",    unit: "CHF", min: 10,   max: 10000, step: 50,  default: "500"  },
+  { id: "price",     label: "Stock price",        unit: "CHF", min: 1,    max: 5000,  step: 1,   default: "50"   },
+  { id: "divAnnual", label: "Dividend / share / yr", unit: "CHF", min: 0.01, max: 50, step: 0.1, default: "2.50" },
+  { id: "growth",    label: "Annual price return",unit: "%",   min: 0,    max: 20,    step: 0.5, default: "3"    },
+  { id: "years",     label: "Time horizon",       unit: "yrs", min: 1,    max: 40,    step: 1,   default: "20"   },
 ];
 
 export default function SimulatorPage() {
@@ -61,14 +61,14 @@ export default function SimulatorPage() {
     Math.min(parseInt(vals.years) || 20, 40),
   ), [vals]);
 
-  const last = data[data.length - 1];
+  const last   = data[data.length - 1];
   const profit = (last?.depotwert ?? 0) - (last?.einzahlungen ?? 0);
 
   const results = [
-    { label: `Depotwert nach ${vals.years} J.`, value: fmtCHF(last?.depotwert ?? 0),   color: "text-primary",     icon: TrendingUp },
-    { label: "Einzahlungen gesamt",               value: fmtCHF(last?.einzahlungen ?? 0), color: "text-sky-400",     icon: DollarSign },
-    { label: "Kumulierte Dividenden",             value: fmtCHF(last?.dividenden ?? 0),   color: "text-emerald-400", icon: PiggyBank  },
-    { label: "Gewinn (Depotwert − Einzahlungen)", value: fmtCHF(profit),                  color: profit > 0 ? "text-amber-400" : "text-red-400", icon: Sparkles },
+    { label: `Portfolio after ${vals.years} yr`,  value: fmtCHF(last?.depotwert ?? 0),    color: "text-emerald-400", icon: TrendingUp },
+    { label: "Total contributions",               value: fmtCHF(last?.einzahlungen ?? 0),  color: "text-sky-400",     icon: DollarSign },
+    { label: "Cumulative dividends",              value: fmtCHF(last?.dividenden ?? 0),    color: "text-foreground",  icon: PiggyBank  },
+    { label: "Total gain",                        value: fmtCHF(profit),                   color: profit > 0 ? "text-emerald-400" : "text-red-400", icon: Sparkles },
   ];
 
   return (
@@ -77,22 +77,22 @@ export default function SimulatorPage() {
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 space-y-8">
         <div>
-          <h1 className="font-display font-bold text-3xl text-foreground tracking-tight">
-            Sparplan-<span className="text-primary">Simulator</span>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground tracking-tight">
+            Savings Plan Simulator
           </h1>
-          <p className="text-muted-foreground text-sm mt-1.5">
-            Wie viel ist dein Portfolio nach X Jahren wert — mit Dividenden-Reinvestition (DRIP)?
+          <p className="text-sm text-muted-foreground mt-1.5 max-w-lg">
+            Project your portfolio value with Dividend Reinvestment (DRIP) over up to 40 years.
           </p>
         </div>
 
-        {/* Input grid */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6">
+        {/* Inputs */}
+        <div className="rounded-xl border border-border bg-card p-5">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {inputs.map(({ id, label, unit, min, max, step }) => (
               <div key={id} className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground block">
                   {label}
-                  <span className="ml-1 text-primary/60">{unit}</span>
+                  <span className="ml-1 text-muted-foreground/50">{unit}</span>
                 </label>
                 <input
                   type="number"
@@ -101,7 +101,7 @@ export default function SimulatorPage() {
                   step={step}
                   value={vals[id]}
                   onChange={(e) => setVals((v) => ({ ...v, [id]: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-foreground font-data text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                  className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground font-data text-sm focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary/50 transition-colors"
                 />
               </div>
             ))}
@@ -111,25 +111,25 @@ export default function SimulatorPage() {
         {/* Results */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {results.map(({ label, value, color, icon: Icon }) => (
-            <div key={label} className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
+            <div key={label} className="rounded-xl border border-border bg-card p-4">
               <Icon className={`w-4 h-4 mb-2 ${color}`} />
-              <div className={`text-xl font-data font-bold ${color}`}>{value}</div>
+              <div className={`text-lg font-data font-bold ${color}`}>{value}</div>
               <div className="text-xs text-muted-foreground mt-1 leading-tight">{label}</div>
             </div>
           ))}
         </div>
 
         {/* Chart */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6">
-          <h2 className="font-display font-semibold text-base text-foreground mb-4">
-            Vermögenswachstum über {vals.years} Jahre
+        <div className="rounded-xl border border-border bg-card p-5">
+          <h2 className="text-sm font-semibold text-foreground mb-4">
+            Portfolio growth over {vals.years} years
           </h2>
           <SimulatorChart data={data} />
         </div>
 
-        <div className="rounded-xl border border-amber-400/15 bg-amber-400/[0.04] p-4 text-sm text-amber-400/80">
-          Diese Simulation dient nur zu Illustrationszwecken. Vergangene Renditen garantieren keine zukünftigen Ergebnisse. Keine Anlageberatung.
-        </div>
+        <p className="text-xs text-muted-foreground border-t border-border pt-6">
+          For illustration purposes only. Past returns do not guarantee future results. Not investment advice.
+        </p>
       </main>
     </div>
   );
