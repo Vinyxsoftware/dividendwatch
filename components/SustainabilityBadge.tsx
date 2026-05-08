@@ -2,14 +2,14 @@
 import type { SustainabilityStatus } from "@/types/stock";
 
 const config: Record<SustainabilityStatus, { label: string; dot: string; pill: string }> = {
-  green:  { label: "Sustainable", dot: "bg-emerald-400", pill: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20" },
-  yellow: { label: "Review",      dot: "bg-amber-400",   pill: "bg-amber-400/10 text-amber-400 border-amber-400/20" },
-  red:    { label: "At Risk",     dot: "bg-red-400",     pill: "bg-red-400/10 text-red-400 border-red-400/20" },
+  green:  { label: "Sustainable", dot: "bg-emerald-600", pill: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  yellow: { label: "Review",      dot: "bg-amber-500",   pill: "bg-amber-50 text-amber-700 border-amber-200" },
+  red:    { label: "At Risk",     dot: "bg-red-500",     pill: "bg-red-50 text-red-600 border-red-200" },
 };
 
 export function SustainabilityBadge({ status }: { status: SustainabilityStatus | null }) {
   if (!status) return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border bg-white/5 text-muted-foreground border-white/10">
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border bg-muted text-muted-foreground border-border">
       —
     </span>
   );

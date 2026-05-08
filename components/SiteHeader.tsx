@@ -12,7 +12,7 @@ export function SiteHeader() {
   const path = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-background/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-xl shadow-sm">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="w-6 h-6 rounded-md bg-primary/15 border border-primary/25 flex items-center justify-center">
@@ -33,7 +33,7 @@ export function SiteHeader() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
                   active
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

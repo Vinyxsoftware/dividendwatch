@@ -111,7 +111,7 @@ export default async function StockDetailPage({
                 {fmtPrice(stock.currentPrice, stock.currency)}
               </div>
               {stock.dividendYield !== null && (
-                <div className="font-data font-semibold text-lg text-emerald-400 mt-0.5">
+                <div className="font-data font-semibold text-lg text-emerald-700 mt-0.5">
                   {fmt(stock.dividendYield, 2, "% yield")}
                 </div>
               )}
@@ -129,8 +129,8 @@ export default async function StockDetailPage({
               key={label}
               className="rounded-xl border border-border bg-card p-4"
             >
-              <Icon className={`w-4 h-4 mb-2 ${highlight ? "text-emerald-400" : "text-muted-foreground"}`} />
-              <div className={`font-data text-lg font-bold ${highlight ? "text-emerald-400" : "text-foreground"}`}>
+              <Icon className={`w-4 h-4 mb-2 ${highlight ? "text-emerald-600" : "text-muted-foreground"}`} />
+              <div className={`font-data text-lg font-bold ${highlight ? "text-emerald-700" : "text-foreground"}`}>
                 {value}
               </div>
               <div className="text-xs text-muted-foreground mt-1">{label}</div>
@@ -150,9 +150,9 @@ export default async function StockDetailPage({
             </div>
             <div className="rounded-lg bg-muted/50 border border-border/60 p-4 space-y-2">
               {[
-                { dot: "bg-emerald-400", status: "Sustainable", desc: "Payout ratio < 60% with positive dividend growth" },
-                { dot: "bg-amber-400",   status: "Review",      desc: "Payout ratio 60–85% or stagnant dividend" },
-                { dot: "bg-red-400",     status: "At Risk",     desc: "Payout ratio > 85% or dividend cut" },
+                { dot: "bg-emerald-600", status: "Sustainable", desc: "Payout ratio < 60% with positive dividend growth" },
+                { dot: "bg-amber-500",   status: "Review",      desc: "Payout ratio 60–85% or stagnant dividend" },
+                { dot: "bg-red-500",     status: "At Risk",     desc: "Payout ratio > 85% or dividend cut" },
               ].map(({ dot, status, desc }) => (
                 <div key={status} className="flex items-start gap-3 text-xs">
                   <span className={`w-1.5 h-1.5 rounded-full mt-0.5 shrink-0 ${dot}`} />
@@ -193,7 +193,7 @@ export default async function StockDetailPage({
               {stock.dividends.map((d, i) => (
                 <div key={d.id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/30 transition-colors">
                   <div className="flex items-center gap-3">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${i === 0 ? "bg-emerald-400" : "bg-border"}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${i === 0 ? "bg-emerald-600" : "bg-border"}`} />
                     <span className="font-data text-sm text-muted-foreground">
                       {new Date(d.exDate).toLocaleDateString("en-CH")}
                     </span>

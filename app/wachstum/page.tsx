@@ -54,13 +54,13 @@ export default async function WachstumPage() {
             {[
               {
                 title: "Dividend Strategy",
-                color: "text-emerald-400",
+                color: "text-emerald-700",
                 pros: ["Regular passive income", "Stable, established companies", "Good for retirement / cash flow"],
                 cons: ["Lower price appreciation", "Withholding tax deductions"],
               },
               {
                 title: "Growth Strategy",
-                color: "text-sky-400",
+                color: "text-blue-600",
                 pros: ["Higher price appreciation potential", "Reinvestment instead of dividends", "Ideal for long time horizons"],
                 cons: ["Higher volatility", "No passive income"],
               },
@@ -70,7 +70,7 @@ export default async function WachstumPage() {
                 <div className="space-y-1.5">
                   {pros.map((p) => (
                     <div key={p} className="flex items-start gap-2 text-xs text-muted-foreground">
-                      <Check className="w-3 h-3 text-emerald-400 mt-0.5 shrink-0" />
+                      <Check className="w-3 h-3 text-emerald-600 mt-0.5 shrink-0" />
                       {p}
                     </div>
                   ))}
@@ -111,7 +111,7 @@ export default async function WachstumPage() {
                     <td className="px-4 py-3.5">
                       <Link
                         href={`/stock/${encodeURIComponent(s.ticker)}`}
-                        className="font-data font-semibold text-sm text-sky-400 hover:underline underline-offset-2"
+                        className="font-data font-semibold text-sm text-blue-600 hover:underline underline-offset-2"
                       >
                         {s.ticker}
                       </Link>

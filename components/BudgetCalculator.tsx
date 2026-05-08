@@ -51,7 +51,7 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
               className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring transition-colors appearance-none cursor-pointer"
             >
               {validStocks.map((s) => (
-                <option key={s.ticker} value={s.ticker} className="bg-[#0D1420]">
+                <option key={s.ticker} value={s.ticker}>
                   {s.ticker} — {s.dividendYield?.toFixed(2)}%
                 </option>
               ))}
@@ -63,8 +63,8 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
               { label: "Shares",            value: shares.toString(),  icon: TrendingUp, color: "text-foreground" },
-              { label: "Annual dividend",   value: fmtCHF(annual),     icon: Calendar,   color: "text-emerald-400" },
-              { label: "Monthly dividend",  value: fmtCHF(monthly),    icon: Wallet,     color: "text-emerald-400" },
+              { label: "Annual dividend",   value: fmtCHF(annual),     icon: Calendar,   color: "text-emerald-700" },
+              { label: "Monthly dividend",  value: fmtCHF(monthly),    icon: Wallet,     color: "text-emerald-700" },
               { label: "Remaining",         value: fmtCHF(remaining),  icon: Minus,      color: "text-muted-foreground" },
             ].map(({ label, value, icon: Icon, color }) => (
               <div key={label} className="rounded-lg bg-muted/50 border border-border/60 p-3">

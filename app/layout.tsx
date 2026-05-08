@@ -21,8 +21,8 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "DividendWatch — Dividendenaktien für Kleinanleger",
-  description: "Welche Aktien lohnen sich wirklich? Dividendenrangliste, Budgetrechner und Nachhaltigkeits-Check für DACH-Anleger.",
+  title: "DividendWatch — Dividend Stocks for Retail Investors",
+  description: "Yield rankings, sustainability scores, and tax guidance for dividend investors in Switzerland, Germany, and Austria.",
 };
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="de"
+      lang="en"
       className={`${dmSans.variable} ${jetbrainsMono.variable} ${syne.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

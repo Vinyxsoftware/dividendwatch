@@ -30,7 +30,7 @@ function CustomTooltip({ active, payload, label }: {
   };
 
   return (
-    <div className="rounded-lg border border-border bg-popover p-3 shadow-lg text-xs space-y-1.5 min-w-[176px]">
+    <div className="rounded-lg border border-border bg-popover p-3 shadow-md text-xs space-y-1.5 min-w-[176px]">
       <div className="font-medium text-muted-foreground mb-2">Year {label}</div>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center justify-between gap-4">
@@ -70,24 +70,24 @@ export function SimulatorChart({ data }: { data: DataPoint[] }) {
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
         <defs>
           <linearGradient id="gradDepotwert" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor="#34d399" stopOpacity={0.18} />
-            <stop offset="95%" stopColor="#34d399" stopOpacity={0.00} />
+            <stop offset="5%"  stopColor="#059669" stopOpacity={0.15} />
+            <stop offset="95%" stopColor="#059669" stopOpacity={0.00} />
           </linearGradient>
           <linearGradient id="gradEinzahlungen" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor="#38bdf8" stopOpacity={0.12} />
-            <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.00} />
+            <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.12} />
+            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.00} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.04)" />
+        <CartesianGrid strokeDasharray="2 4" stroke="rgba(15,23,42,0.06)" />
         <XAxis
           dataKey="year"
-          tick={{ fontSize: 11, fill: "#50617a", fontFamily: "var(--font-jetbrains-mono)" }}
+          tick={{ fontSize: 11, fill: "#64748b", fontFamily: "var(--font-jetbrains-mono)" }}
           tickLine={false}
           axisLine={false}
           tickFormatter={(v) => `Y${v}`}
         />
         <YAxis
-          tick={{ fontSize: 11, fill: "#50617a", fontFamily: "var(--font-jetbrains-mono)" }}
+          tick={{ fontSize: 11, fill: "#64748b", fontFamily: "var(--font-jetbrains-mono)" }}
           tickLine={false}
           axisLine={false}
           tickFormatter={(v) => {
@@ -99,8 +99,8 @@ export function SimulatorChart({ data }: { data: DataPoint[] }) {
         />
         <Tooltip content={<CustomTooltip />} />
         <Legend content={<CustomLegend />} />
-        <Area type="monotone" dataKey="einzahlungen" stroke="#38bdf8" fill="url(#gradEinzahlungen)" strokeWidth={1.5} dot={false} />
-        <Area type="monotone" dataKey="depotwert"    stroke="#34d399" fill="url(#gradDepotwert)"    strokeWidth={2}   dot={false} />
+        <Area type="monotone" dataKey="einzahlungen" stroke="#3b82f6" fill="url(#gradEinzahlungen)" strokeWidth={1.5} dot={false} />
+        <Area type="monotone" dataKey="depotwert"    stroke="#059669" fill="url(#gradDepotwert)"    strokeWidth={2}   dot={false} />
       </AreaChart>
     </ResponsiveContainer>
   );

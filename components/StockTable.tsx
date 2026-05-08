@@ -20,8 +20,8 @@ function fmtPrice(price: number | null, currency: string) {
 
 function yieldColor(y: number | null) {
   if (y === null) return "text-muted-foreground";
-  if (y >= 4) return "text-emerald-400";
-  if (y >= 2) return "text-sky-400";
+  if (y >= 4) return "text-emerald-700";
+  if (y >= 2) return "text-blue-600";
   return "text-muted-foreground";
 }
 

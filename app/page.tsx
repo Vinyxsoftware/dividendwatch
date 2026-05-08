@@ -41,11 +41,11 @@ export default async function Home() {
             </span>
             <span className="text-border hidden sm:inline">·</span>
             <span className="text-muted-foreground">
-              Avg. yield <span className="font-data font-semibold text-emerald-400">{avgYield}%</span>
+              Avg. yield <span className="font-data font-semibold text-emerald-700">{avgYield}%</span>
             </span>
             <span className="text-border hidden sm:inline">·</span>
             <span className="text-muted-foreground">
-              Top yield <span className="font-data font-semibold text-emerald-400">{topYield}%</span>
+              Top yield <span className="font-data font-semibold text-emerald-700">{topYield}%</span>
             </span>
             <span className="text-border hidden sm:inline">·</span>
             <span className="text-muted-foreground font-data text-xs">CH · EU · US</span>
@@ -68,14 +68,14 @@ export default async function Home() {
 
           <Link
             href="/wachstum"
-            className="group flex items-center gap-3 px-4 py-3 rounded-lg bg-card border border-border hover:border-sky-400/40 transition-colors"
+            className="group flex items-center gap-3 px-4 py-3 rounded-lg bg-card border border-border hover:border-blue-400/40 transition-colors"
           >
-            <Rocket className="w-4 h-4 text-muted-foreground shrink-0 group-hover:text-sky-400 transition-colors" />
+            <Rocket className="w-4 h-4 text-muted-foreground shrink-0 group-hover:text-blue-600 transition-colors" />
             <div className="min-w-0">
               <div className="text-sm font-medium text-foreground">Growth Stocks</div>
               <div className="text-xs text-muted-foreground">NVDA, MSFT, AMZN and more</div>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-muted-foreground ml-auto shrink-0 group-hover:translate-x-0.5 group-hover:text-sky-400 transition-all" />
+            <ArrowRight className="w-3.5 h-3.5 text-muted-foreground ml-auto shrink-0 group-hover:translate-x-0.5 group-hover:text-blue-600 transition-all" />
           </Link>
         </div>
 
