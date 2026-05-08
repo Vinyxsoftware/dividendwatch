@@ -2,7 +2,7 @@
 const YahooFinance = require("yahoo-finance2").default;
 import { calcSustainability } from "./calculations";
 
-const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
 
 export const TOP_DIVIDEND_TICKERS: { ticker: string; region: string; exchange: string }[] = [
   // Schweiz
@@ -57,14 +57,34 @@ export const GROWTH_TICKERS: { ticker: string; region: string; exchange: string 
   { ticker: "LONN.SW",   region: "CH", exchange: "SIX" },
 ];
 
+function detectFrequency(dates: Date[]): string {
+  if (dates.length < 2) return "annual";
+  const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
+  const gaps: number[] = [];
+  for (let i = 1; i < Math.min(sorted.length, 6); i++) {
+    gaps.push((sorted[i].getTime() - sorted[i - 1].getTime()) / (1000 * 60 * 60 * 24));
+  }
+  const avg = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  if (avg < 45) return "monthly";
+  if (avg < 120) return "quarterly";
+  if (avg < 240) return "semi-annual";
+  return "annual";
+}
+
 export async function fetchDividendHistory(ticker: string) {
   try {
-    const historical = await yahooFinance.dividends(ticker, { period1: "2014-01-01" }, { validateResult: false });
-    return (historical ?? []).map((d: { date: Date; amount: number }) => ({
-      exDate: d.date,
-      amount: d.amount,
-      frequency: "quarterly",
-    }));
+    const result = await yahooFinance.chart(
+      ticker,
+      { period1: "2014-01-01", period2: new Date(), events: "div", interval: "1mo" },
+      { validateResult: false }
+    );
+    const divMap = result?.events?.dividends ?? {};
+    const divs: { date: Date; amount: number }[] = Object.values(divMap).map(
+      (d: unknown) => ({ date: new Date((d as { date: string }).date), amount: (d as { amount: number }).amount })
+    );
+    if (divs.length === 0) return [];
+    const frequency = detectFrequency(divs.map((d) => d.date));
+    return divs.map((d) => ({ exDate: d.date, amount: d.amount, frequency }));
   } catch {
     return [];
   }
