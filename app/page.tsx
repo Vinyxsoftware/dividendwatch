@@ -4,7 +4,7 @@ import { StockTable } from "@/components/StockTable";
 import { BudgetCalculator } from "@/components/BudgetCalculator";
 import type { Stock } from "@/types/stock";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const stocks = (await prisma.stock.findMany({

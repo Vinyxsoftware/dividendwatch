@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GROWTH_TICKERS } from "@/lib/yahoo";
 
+export const dynamic = "force-dynamic";
+
 function fmt(v: number | null, d = 2, s = "") {
   if (v === null || v === undefined) return "—";
   return `${v.toFixed(d)}${s}`;
@@ -21,7 +23,6 @@ function fmtCap(mc: number | null) {
   return `${(mc / 1e6).toFixed(0)} Mio.`;
 }
 
-export const revalidate = 3600;
 
 export default async function WachstumPage() {
   const growthTickers = GROWTH_TICKERS.map((t) => t.ticker);

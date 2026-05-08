@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Stock } from "@/types/stock";
 
+export const dynamic = "force-dynamic";
+
 function fmt(v: number | null, decimals = 2, suffix = "") {
   if (v === null || v === undefined) return "—";
   return `${v.toFixed(decimals)}${suffix}`;
