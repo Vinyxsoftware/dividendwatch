@@ -86,7 +86,7 @@ export default async function StockDetailPage({
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 space-y-8">
 
         {/* Hero */}
-        <div className="rounded-xl border border-border bg-card p-5">
+        <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-2.5">
@@ -107,15 +107,15 @@ export default async function StockDetailPage({
             </div>
 
             <div className="text-right">
-              <div className="font-data font-bold text-2xl text-foreground">
+              <div className="font-data font-bold text-3xl text-foreground leading-none">
                 {fmtPrice(stock.currentPrice, stock.currency)}
               </div>
               {stock.dividendYield !== null && (
-                <div className="font-data font-semibold text-lg text-emerald-700 mt-0.5">
+                <div className="font-data font-semibold text-xl text-emerald-700 mt-1">
                   {fmt(stock.dividendYield, 2, "% yield")}
                 </div>
               )}
-              <div className="mt-2">
+              <div className="mt-3">
                 <SustainabilityBadge status={stock.sustainabilityStatus as never} />
               </div>
             </div>
@@ -127,13 +127,13 @@ export default async function StockDetailPage({
           {metrics.map(({ label, value, icon: Icon, highlight }) => (
             <div
               key={label}
-              className="rounded-xl border border-border bg-card p-4"
+              className={`rounded-xl border bg-card p-4 shadow-sm ${highlight ? "border-primary/20 bg-primary/[0.02]" : "border-border"}`}
             >
-              <Icon className={`w-4 h-4 mb-2 ${highlight ? "text-emerald-600" : "text-muted-foreground"}`} />
-              <div className={`font-data text-lg font-bold ${highlight ? "text-emerald-700" : "text-foreground"}`}>
+              <Icon className={`w-4 h-4 mb-3 ${highlight ? "text-emerald-600" : "text-muted-foreground"}`} />
+              <div className={`font-data text-xl font-bold leading-none ${highlight ? "text-emerald-700" : "text-foreground"}`}>
                 {value}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">{label}</div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-2">{label}</div>
             </div>
           ))}
         </div>

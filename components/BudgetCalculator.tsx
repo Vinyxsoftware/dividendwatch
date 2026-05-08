@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { TrendingUp, Calendar, Wallet, Minus } from "lucide-react";
 import type { Stock } from "@/types/stock";
 
 function fmtCHF(v: number) {
@@ -22,15 +21,23 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
   const monthly   = annual / 12;
   const remaining = budgetNum - shares * (selected?.currentPrice ?? 0);
 
+  const results = [
+    { label: "Shares you can buy",  value: shares.toString(),  highlight: false },
+    { label: "Annual dividend",     value: fmtCHF(annual),     highlight: true  },
+    { label: "Monthly dividend",    value: fmtCHF(monthly),    highlight: true  },
+    { label: "Cash remaining",      value: fmtCHF(remaining),  highlight: false },
+  ];
+
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="rounded-xl border border-border bg-card shadow-sm">
       <div className="px-5 py-4 border-b border-border">
         <h2 className="text-sm font-semibold text-foreground">Budget Calculator</h2>
         <p className="text-xs text-muted-foreground mt-0.5">How much dividend income does your budget buy?</p>
       </div>
 
-      <div className="p-5 space-y-5">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="p-5 grid sm:grid-cols-2 gap-6">
+        {/* Inputs */}
+        <div className="space-y-3">
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground">Budget (CHF)</label>
             <input
@@ -39,7 +46,7 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
               max={100000}
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground font-data text-sm focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary/50 transition-colors"
+              className="w-full px-3 py-2.5 rounded-lg bg-muted border border-border text-foreground font-data text-sm focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary/50 transition-colors"
             />
           </div>
 
@@ -48,7 +55,7 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
             <select
               value={selected?.ticker ?? ""}
               onChange={(e) => setTicker(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring transition-colors appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring transition-colors appearance-none cursor-pointer"
             >
               {validStocks.map((s) => (
                 <option key={s.ticker} value={s.ticker}>
@@ -57,25 +64,30 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
               ))}
             </select>
           </div>
+
+          {selected && (
+            <p className="text-xs text-muted-foreground">
+              {selected.name} · {fmtCHF(selected.currentPrice ?? 0)} per share
+            </p>
+          )}
         </div>
 
+        {/* Results */}
         {selected && (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {[
-              { label: "Shares",            value: shares.toString(),  icon: TrendingUp, color: "text-foreground" },
-              { label: "Annual dividend",   value: fmtCHF(annual),     icon: Calendar,   color: "text-emerald-700" },
-              { label: "Monthly dividend",  value: fmtCHF(monthly),    icon: Wallet,     color: "text-emerald-700" },
-              { label: "Remaining",         value: fmtCHF(remaining),  icon: Minus,      color: "text-muted-foreground" },
-            ].map(({ label, value, icon: Icon, color }) => (
-              <div key={label} className="rounded-lg bg-muted/50 border border-border/60 p-3">
-                <Icon className={`w-3.5 h-3.5 mb-2 ${color}`} />
-                <div className={`text-base font-data font-semibold ${color}`}>{value}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
+          <div className="flex flex-col justify-center divide-y divide-border/60">
+            {results.map(({ label, value, highlight }) => (
+              <div key={label} className="flex items-baseline justify-between py-3 first:pt-0 last:pb-0">
+                <span className="text-xs text-muted-foreground">{label}</span>
+                <span className={`font-data font-bold text-lg ${highlight ? "text-emerald-700" : "text-foreground"}`}>
+                  {value}
+                </span>
               </div>
             ))}
           </div>
         )}
+      </div>
 
+      <div className="px-5 pb-4">
         <p className="text-xs text-muted-foreground">
           Not investment advice. Prices and dividends can change. Dividends are not guaranteed.
         </p>

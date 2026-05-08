@@ -25,6 +25,13 @@ function yieldColor(y: number | null) {
   return "text-muted-foreground";
 }
 
+function yieldDot(y: number | null) {
+  if (y === null) return "bg-muted-foreground/25";
+  if (y >= 4) return "bg-emerald-600";
+  if (y >= 2) return "bg-blue-500";
+  return "bg-muted-foreground/25";
+}
+
 const regions = [
   { value: "all", label: "All" },
   { value: "CH",  label: "Switzerland" },
@@ -73,22 +80,22 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         </button>
 
         <span className="ml-auto text-xs text-muted-foreground font-data">
-          {filtered.length} stocks
+          {filtered.length} results
         </span>
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-border overflow-hidden">
+      <div className="rounded-xl border border-border overflow-hidden shadow-sm">
         <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-muted/60">
-              <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider w-24">Ticker</th>
-              <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">Price</th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Div./Year</th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">Yield</th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Payout</th>
-              <th className="px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Sust.</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-24">Ticker</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Price</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Div./Year</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Yield</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Payout</th>
+              <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Sust.</th>
             </tr>
           </thead>
           <tbody>
@@ -104,33 +111,34 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
                 key={s.id}
                 className="border-b border-border/50 last:border-0 hover:bg-muted/40 transition-colors"
               >
-                <td className="px-4 py-3.5">
+                <td className="px-4 py-4">
                   <Link
                     href={`/stock/${encodeURIComponent(s.ticker)}`}
-                    className="font-data font-semibold text-sm text-primary hover:underline underline-offset-2 transition-colors"
+                    className="font-data font-bold text-sm text-primary hover:underline underline-offset-2 transition-colors"
                   >
                     {s.ticker}
                   </Link>
                 </td>
-                <td className="px-4 py-3.5">
+                <td className="px-4 py-4">
                   <div className="font-medium text-sm text-foreground leading-tight">{s.name}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{s.exchange} · {s.region}</div>
                 </td>
-                <td className="px-4 py-3.5 text-right font-data text-sm text-foreground">
+                <td className="px-4 py-4 text-right font-data text-sm font-medium text-foreground">
                   {fmtPrice(s.currentPrice, s.currency)}
                 </td>
-                <td className="px-4 py-3.5 text-right font-data text-sm text-muted-foreground hidden sm:table-cell">
+                <td className="px-4 py-4 text-right font-data text-sm text-muted-foreground hidden sm:table-cell">
                   {s.annualDividend ? fmtPrice(s.annualDividend, s.currency) : "—"}
                 </td>
-                <td className="px-4 py-3.5 text-right">
-                  <span className={`font-data font-semibold text-sm ${yieldColor(s.dividendYield)}`}>
+                <td className="px-4 py-4 text-right">
+                  <span className={`inline-flex items-center gap-1.5 font-data font-semibold text-sm ${yieldColor(s.dividendYield)}`}>
                     {s.dividendYield !== null ? `${s.dividendYield.toFixed(2)}%` : "—"}
+                    <span className={`w-1 h-3.5 rounded-full shrink-0 ${yieldDot(s.dividendYield)}`} />
                   </span>
                 </td>
-                <td className="px-4 py-3.5 text-right font-data text-sm text-muted-foreground hidden md:table-cell">
+                <td className="px-4 py-4 text-right font-data text-sm text-muted-foreground hidden md:table-cell">
                   {fmt(s.payoutRatio, 1, "%")}
                 </td>
-                <td className="px-4 py-3.5 hidden lg:table-cell">
+                <td className="px-4 py-4 hidden lg:table-cell">
                   <SustainabilityBadge status={s.sustainabilityStatus as never} />
                 </td>
               </tr>

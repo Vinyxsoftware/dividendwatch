@@ -111,10 +111,10 @@ export default function SimulatorPage() {
         {/* Results */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {results.map(({ label, value, color, icon: Icon }) => (
-            <div key={label} className="rounded-xl border border-border bg-card p-4">
-              <Icon className={`w-4 h-4 mb-2 ${color}`} />
-              <div className={`text-lg font-data font-bold ${color}`}>{value}</div>
-              <div className="text-xs text-muted-foreground mt-1 leading-tight">{label}</div>
+            <div key={label} className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <Icon className={`w-4 h-4 mb-3 ${color}`} />
+              <div className={`text-2xl font-data font-bold leading-none ${color}`}>{value}</div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-2 leading-tight">{label}</div>
             </div>
           ))}
         </div>
