@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Stock {
+  id                 String   @id @default(cuid())
+  ticker             String   @unique
+  name               String
+  isin               String?
+  exchange           String
+  sector             String?
+  country            String?
+  region             String?
+  currency           String   @default("USD")
+  currentPrice       Float?
+  marketCap          Float?
+  peRatio            Float?
+  beta               Float?
+  payoutRatio        Float?
+  dividendYield      Float?
+  annualDividend     Float?
+  dividendGrowth3Y   Float?
+  epsGrowth          Float?
+  freeCashFlowYield  Float?
+  debtToEquity       Float?
+  sustainabilityStatus String?
+  lastUpdated        DateTime @updatedAt
+  createdAt          DateTime @default(now())
+
+  dividends  Dividend[]
+  snapshots  PriceSnapshot[]
+}
+
+model Dividend {
+  id        String    @id @default(cuid())
+  stockId   String
+  stock     Stock     @relation(fields: [stockId], references: [id])
+  amount    Float
+  currency  String    @default("USD")
+  exDate    DateTime
+  payDate   DateTime?
+  frequency String
+  yield     Float?
+  createdAt DateTime  @default(now())
+}
+
+model PriceSnapshot {
+  id      String   @id @default(cuid())
+  stockId String
+  stock   Stock    @relation(fields: [stockId], references: [id])
+  price   Float
+  date    DateTime
+}
