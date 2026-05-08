@@ -1,13 +1,13 @@
 "use client";
 import { useState, useMemo } from "react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { SiteHeader } from "@/components/SiteHeader";
 import { SimulatorChart } from "@/components/SimulatorChart";
+import { TrendingUp, DollarSign, PiggyBank, Sparkles } from "lucide-react";
 
 function fmtCHF(v: number) {
-  return new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF", maximumFractionDigits: 0 }).format(v);
+  return new Intl.NumberFormat("de-CH", {
+    style: "currency", currency: "CHF", maximumFractionDigits: 0,
+  }).format(v);
 }
 
 function calcDRIP(
@@ -15,125 +15,121 @@ function calcDRIP(
   initialPrice: number,
   annualDividendPerShare: number,
   annualGrowthRate: number,
-  years: number
+  years: number,
 ) {
   const data = [];
-  let totalShares = 0;
-  let totalContributions = 0;
-  let totalDividends = 0;
+  let totalShares = 0, totalContributions = 0, totalDividends = 0;
   let price = initialPrice;
 
   for (let y = 1; y <= years; y++) {
     for (let m = 0; m < 12; m++) {
       totalContributions += monthlyBudget;
-      const newShares = monthlyBudget / price;
-      totalShares += newShares;
+      totalShares += monthlyBudget / price;
       const monthlyDiv = (totalShares * annualDividendPerShare) / 12;
       totalDividends += monthlyDiv;
-      const reinvestedShares = monthlyDiv / price;
-      totalShares += reinvestedShares;
+      totalShares += monthlyDiv / price;
       price *= 1 + annualGrowthRate / 12;
     }
     data.push({
       year: y,
-      depotwert: Math.round(totalShares * price),
+      depotwert:    Math.round(totalShares * price),
       einzahlungen: Math.round(totalContributions),
-      dividenden: Math.round(totalDividends),
+      dividenden:   Math.round(totalDividends),
     });
   }
   return data;
 }
 
+const inputs = [
+  { id: "budget",   label: "Monatliches Budget",   unit: "CHF", min: 10,   max: 10000, step: 50,  default: "500"  },
+  { id: "price",    label: "Aktienkurs",            unit: "CHF", min: 1,    max: 5000,  step: 1,   default: "50"   },
+  { id: "divAnnual",label: "Dividende / Aktie / J", unit: "CHF", min: 0.01, max: 50,    step: 0.1, default: "2.50" },
+  { id: "growth",   label: "Kursrendite / Jahr",    unit: "%",   min: 0,    max: 20,    step: 0.5, default: "3"    },
+  { id: "years",    label: "Anlagezeitraum",        unit: "J",   min: 1,    max: 40,    step: 1,   default: "20"   },
+];
+
 export default function SimulatorPage() {
-  const [budget, setBudget]     = useState("500");
-  const [price, setPrice]       = useState("50");
-  const [divAnnual, setDiv]     = useState("2.50");
-  const [growth, setGrowth]     = useState("3");
-  const [years, setYears]       = useState("20");
+  const [vals, setVals] = useState<Record<string, string>>({
+    budget: "500", price: "50", divAnnual: "2.50", growth: "3", years: "20",
+  });
 
   const data = useMemo(() => calcDRIP(
-    parseFloat(budget)   || 500,
-    parseFloat(price)    || 50,
-    parseFloat(divAnnual)|| 2.5,
-    (parseFloat(growth)  || 3) / 100,
-    Math.min(parseInt(years) || 20, 40),
-  ), [budget, price, divAnnual, growth, years]);
+    parseFloat(vals.budget)    || 500,
+    parseFloat(vals.price)     || 50,
+    parseFloat(vals.divAnnual) || 2.5,
+    (parseFloat(vals.growth)   || 3) / 100,
+    Math.min(parseInt(vals.years) || 20, 40),
+  ), [vals]);
 
   const last = data[data.length - 1];
+  const profit = (last?.depotwert ?? 0) - (last?.einzahlungen ?? 0);
 
-  const inputs = [
-    { label: "Monatliches Budget (CHF)", value: budget, set: setBudget, min: "10",  max: "10000", step: "50"  },
-    { label: "Aktienkurs (CHF)",         value: price,  set: setPrice,  min: "1",   max: "5000",  step: "1"   },
-    { label: "Dividende / Aktie / Jahr", value: divAnnual, set: setDiv, min: "0.01",max: "50",    step: "0.1" },
-    { label: "Kursrendite / Jahr (%)",   value: growth, set: setGrowth, min: "0",   max: "20",    step: "0.5" },
-    { label: "Anlagezeitraum (Jahre)",   value: years,  set: setYears,  min: "1",   max: "40",    step: "1"   },
+  const results = [
+    { label: `Depotwert nach ${vals.years} J.`, value: fmtCHF(last?.depotwert ?? 0),   color: "text-primary",     icon: TrendingUp },
+    { label: "Einzahlungen gesamt",               value: fmtCHF(last?.einzahlungen ?? 0), color: "text-sky-400",     icon: DollarSign },
+    { label: "Kumulierte Dividenden",             value: fmtCHF(last?.dividenden ?? 0),   color: "text-emerald-400", icon: PiggyBank  },
+    { label: "Gewinn (Depotwert − Einzahlungen)", value: fmtCHF(profit),                  color: profit > 0 ? "text-amber-400" : "text-red-400", icon: Sparkles },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">← Zurück</Link>
-          <span className="text-muted-foreground">/</span>
-          <span className="font-semibold">📊 Sparplan-Simulator</span>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
 
-      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 space-y-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Sparplan-Simulator</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+          <h1 className="font-display font-bold text-3xl text-foreground tracking-tight">
+            Sparplan-<span className="text-primary">Simulator</span>
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1.5">
             Wie viel ist dein Portfolio nach X Jahren wert — mit Dividenden-Reinvestition (DRIP)?
           </p>
         </div>
 
-        {/* Inputs */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-              {inputs.map(({ label, value, set, min, max, step }) => (
-                <div key={label} className="space-y-1.5">
-                  <Label className="text-xs">{label}</Label>
-                  <Input
-                    type="number" min={min} max={max} step={step}
-                    value={value}
-                    onChange={(e) => set(e.target.value)}
-                    className="font-mono"
-                  />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Input grid */}
+        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {inputs.map(({ id, label, unit, min, max, step }) => (
+              <div key={id} className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground block">
+                  {label}
+                  <span className="ml-1 text-primary/60">{unit}</span>
+                </label>
+                <input
+                  type="number"
+                  min={min}
+                  max={max}
+                  step={step}
+                  value={vals[id]}
+                  onChange={(e) => setVals((v) => ({ ...v, [id]: e.target.value }))}
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-foreground font-data text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Results */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Depotwert nach " + years + " Jahren", value: fmtCHF(last?.depotwert ?? 0), color: "text-primary" },
-            { label: "Einzahlungen gesamt",                  value: fmtCHF(last?.einzahlungen ?? 0), color: "text-green-600" },
-            { label: "Kumulierte Dividenden",                value: fmtCHF(last?.dividenden ?? 0),   color: "text-blue-600" },
-            { label: "Gewinn",                               value: fmtCHF((last?.depotwert ?? 0) - (last?.einzahlungen ?? 0)), color: "text-emerald-600" },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="bg-white rounded-xl border p-4">
-              <div className={`text-xl font-bold ${color}`}>{value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{label}</div>
+          {results.map(({ label, value, color, icon: Icon }) => (
+            <div key={label} className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
+              <Icon className={`w-4 h-4 mb-2 ${color}`} />
+              <div className={`text-xl font-data font-bold ${color}`}>{value}</div>
+              <div className="text-xs text-muted-foreground mt-1 leading-tight">{label}</div>
             </div>
           ))}
         </div>
 
         {/* Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Vermögenswachstum über {years} Jahre</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SimulatorChart data={data} />
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6">
+          <h2 className="font-display font-semibold text-base text-foreground mb-4">
+            Vermögenswachstum über {vals.years} Jahre
+          </h2>
+          <SimulatorChart data={data} />
+        </div>
 
-        <p className="text-xs text-muted-foreground bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-          ⚠️ Diese Simulation dient nur zu Illustrationszwecken. Vergangene Renditen garantieren keine zukünftigen Ergebnisse. Kurse und Dividenden können fallen oder entfallen. Keine Anlageberatung.
-        </p>
+        <div className="rounded-xl border border-amber-400/15 bg-amber-400/[0.04] p-4 text-sm text-amber-400/80">
+          Diese Simulation dient nur zu Illustrationszwecken. Vergangene Renditen garantieren keine zukünftigen Ergebnisse. Keine Anlageberatung.
+        </div>
       </main>
     </div>
   );
