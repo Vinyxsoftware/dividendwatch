@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { TOP_DIVIDEND_TICKERS, fetchStockData } from "@/lib/yahoo";
 
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-refresh-secret");
+  const authHeader = req.headers.get("authorization");
+  const secret = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
   if (secret !== process.env.REFRESH_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

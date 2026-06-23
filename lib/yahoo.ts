@@ -57,6 +57,18 @@ export const GROWTH_TICKERS: { ticker: string; region: string; exchange: string 
   { ticker: "LONN.SW",   region: "CH", exchange: "SIX" },
 ];
 
+function calcDividendGrowth3Y(history: { exDate: Date; amount: number }[]): number | null {
+  if (history.length < 2) return null;
+  const sorted = [...history].sort((a, b) => a.exDate.getTime() - b.exDate.getTime());
+  const latest = sorted[sorted.length - 1];
+  const threeYearsAgo = new Date(latest.exDate.getTime() - 3 * 365 * 24 * 60 * 60 * 1000);
+  const candidates = sorted.filter(d => d.exDate <= threeYearsAgo);
+  if (candidates.length === 0) return null;
+  const reference = candidates[candidates.length - 1];
+  if (reference.amount === 0) return null;
+  return ((latest.amount - reference.amount) / reference.amount) * 100;
+}
+
 function detectFrequency(dates: Date[]): string {
   if (dates.length < 2) return "annual";
   const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
@@ -104,9 +116,10 @@ export async function fetchStockData(ticker: string) {
     const dividendYield = detail?.dividendYield ? detail.dividendYield * 100 : null;
     const annualDividend = detail?.dividendRate ?? null;
     const payoutRatio = detail?.payoutRatio ? detail.payoutRatio * 100 : null;
-    const peRatio = detail?.trailingPE ?? stats?.trailingEps ?? null;
+    const peRatio = detail?.trailingPE ?? null;
     const beta = detail?.beta ?? null;
-    const dividendGrowth3Y: number | null = null; // requires historical data
+    const dividendHistory = await fetchDividendHistory(ticker);
+    const dividendGrowth3Y = calcDividendGrowth3Y(dividendHistory);
     const sustainabilityStatus = calcSustainability(payoutRatio, dividendGrowth3Y);
 
     return {
