@@ -3,27 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SustainabilityBadge } from "@/components/SustainabilityBadge";
 import { Badge } from "@/components/ui/badge";
+import { fmt, fmtPrice, fmtMarketCap } from "@/lib/format";
 import { DollarSign, Percent, BarChart2, Scale, TrendingUp, ShieldCheck, Globe, Building2, CalendarDays } from "lucide-react";
 import type { Stock } from "@/types/stock";
 
 export const dynamic = "force-dynamic";
-
-function fmt(v: number | null, decimals = 2, suffix = "") {
-  if (v === null || v === undefined) return "—";
-  return `${v.toFixed(decimals)}${suffix}`;
-}
-function fmtPrice(price: number | null, currency: string) {
-  if (!price) return "—";
-  return new Intl.NumberFormat("de-CH", {
-    style: "currency", currency, minimumFractionDigits: 2,
-  }).format(price);
-}
-function fmtMarketCap(mc: number | null) {
-  if (!mc) return "—";
-  if (mc >= 1e12) return `${(mc / 1e12).toFixed(1)}T`;
-  if (mc >= 1e9)  return `${(mc / 1e9).toFixed(1)}B`;
-  return `${(mc / 1e6).toFixed(0)}M`;
-}
 
 export default async function StockDetailPage({
   params,

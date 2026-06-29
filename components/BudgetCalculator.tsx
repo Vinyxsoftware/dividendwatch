@@ -1,11 +1,20 @@
 "use client";
 import { useState } from "react";
 import type { Stock } from "@/types/stock";
+import { fmtCHF } from "@/lib/format";
 
-function fmtCHF(v: number) {
-  return new Intl.NumberFormat("de-CH", {
-    style: "currency", currency: "CHF", minimumFractionDigits: 2,
-  }).format(v);
+// Approximate exchange rates: 1 unit of foreign currency in CHF.
+// Used only for share-count estimation — not suitable for financial decisions.
+const FX_TO_CHF: Record<string, number> = {
+  CHF: 1.00,
+  EUR: 1.05,
+  USD: 0.90,
+  GBP: 1.13,
+  DKK: 0.14,
+};
+
+function toCHF(amount: number, currency: string): number {
+  return amount * (FX_TO_CHF[currency] ?? 1.0);
 }
 
 export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
@@ -16,10 +25,13 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
   const selected = validStocks.find((s) => s.ticker === ticker) ?? validStocks[0];
 
   const budgetNum = parseFloat(budget) || 0;
-  const shares    = selected ? Math.floor(budgetNum / (selected.currentPrice ?? 1)) : 0;
-  const annual    = shares * (selected?.annualDividend ?? 0);
-  const monthly   = annual / 12;
-  const remaining = budgetNum - shares * (selected?.currentPrice ?? 0);
+  const currency = selected?.currency ?? "USD";
+  const priceInCHF = selected ? toCHF(selected.currentPrice ?? 0, currency) : 0;
+  const shares = priceInCHF > 0 ? Math.floor(budgetNum / priceInCHF) : 0;
+  const divInCHF = selected ? toCHF(selected.annualDividend ?? 0, currency) : 0;
+  const annual = shares * divInCHF;
+  const monthly = annual / 12;
+  const remaining = budgetNum - shares * priceInCHF;
 
   const results = [
     { label: "Shares you can buy",  value: shares.toString(),  highlight: false },
@@ -67,7 +79,7 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
 
           {selected && (
             <p className="text-xs text-muted-foreground">
-              {selected.name} · {fmtCHF(selected.currentPrice ?? 0)} per share
+              {selected.name} · {fmtCHF(priceInCHF)} per share (converted from {currency})
             </p>
           )}
         </div>
@@ -89,7 +101,7 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
 
       <div className="px-5 pb-4">
         <p className="text-xs text-muted-foreground">
-          Not investment advice. Prices and dividends can change. Dividends are not guaranteed.
+          Not investment advice. FX rates are approximate. Prices and dividends can change.
         </p>
       </div>
     </div>

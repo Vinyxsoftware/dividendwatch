@@ -3,12 +3,14 @@ import { useState, useMemo } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SimulatorChart } from "@/components/SimulatorChart";
 import { TrendingUp, DollarSign, PiggyBank, Sparkles } from "lucide-react";
+import { fmtCHFRound } from "@/lib/format";
 
-function fmtCHF(v: number) {
-  return new Intl.NumberFormat("de-CH", {
-    style: "currency", currency: "CHF", maximumFractionDigits: 0,
-  }).format(v);
-}
+const TAX_PRESETS = [
+  { label: "None (0%)",    value: 0    },
+  { label: "US (15%)",     value: 0.15 },
+  { label: "DE/AT (25%)", value: 0.25 },
+  { label: "CH (35%)",     value: 0.35 },
+];
 
 function calcDRIP(
   monthlyBudget: number,
@@ -16,6 +18,7 @@ function calcDRIP(
   annualDividendPerShare: number,
   annualGrowthRate: number,
   years: number,
+  withholdingTaxRate: number,
 ) {
   const data = [];
   let totalShares = 0, totalContributions = 0, totalDividends = 0;
@@ -25,9 +28,10 @@ function calcDRIP(
     for (let m = 0; m < 12; m++) {
       totalContributions += monthlyBudget;
       totalShares += monthlyBudget / price;
-      const monthlyDiv = (totalShares * annualDividendPerShare) / 12;
-      totalDividends += monthlyDiv;
-      totalShares += monthlyDiv / price;
+      const grossMonthlyDiv = (totalShares * annualDividendPerShare) / 12;
+      const netMonthlyDiv = grossMonthlyDiv * (1 - withholdingTaxRate);
+      totalDividends += netMonthlyDiv;
+      totalShares += netMonthlyDiv / price;
       price *= 1 + annualGrowthRate / 12;
     }
     data.push({
@@ -52,6 +56,7 @@ export default function SimulatorPage() {
   const [vals, setVals] = useState<Record<string, string>>({
     budget: "500", price: "50", divAnnual: "2.50", growth: "3", years: "20",
   });
+  const [taxRate, setTaxRate] = useState(0);
 
   const data = useMemo(() => calcDRIP(
     parseFloat(vals.budget)    || 500,
@@ -59,16 +64,17 @@ export default function SimulatorPage() {
     parseFloat(vals.divAnnual) || 2.5,
     (parseFloat(vals.growth)   || 3) / 100,
     Math.min(parseInt(vals.years) || 20, 40),
-  ), [vals]);
+    taxRate,
+  ), [vals, taxRate]);
 
   const last   = data[data.length - 1];
   const profit = (last?.depotwert ?? 0) - (last?.einzahlungen ?? 0);
 
   const results = [
-    { label: `Portfolio after ${vals.years} yr`,  value: fmtCHF(last?.depotwert ?? 0),    color: "text-emerald-700", icon: TrendingUp },
-    { label: "Total contributions",               value: fmtCHF(last?.einzahlungen ?? 0),  color: "text-blue-600",    icon: DollarSign },
-    { label: "Cumulative dividends",              value: fmtCHF(last?.dividenden ?? 0),    color: "text-foreground",  icon: PiggyBank  },
-    { label: "Total gain",                        value: fmtCHF(profit),                   color: profit > 0 ? "text-emerald-700" : "text-red-600", icon: Sparkles },
+    { label: `Portfolio after ${vals.years} yr`,  value: fmtCHFRound(last?.depotwert ?? 0),    color: "text-emerald-700", icon: TrendingUp },
+    { label: "Total contributions",               value: fmtCHFRound(last?.einzahlungen ?? 0),  color: "text-blue-600",    icon: DollarSign },
+    { label: "Cumulative dividends (net)",        value: fmtCHFRound(last?.dividenden ?? 0),    color: "text-foreground",  icon: PiggyBank  },
+    { label: "Total gain",                        value: fmtCHFRound(profit),                   color: profit > 0 ? "text-emerald-700" : "text-red-600", icon: Sparkles },
   ];
 
   return (
@@ -96,24 +102,48 @@ export default function SimulatorPage() {
               <h2 className="text-sm font-semibold text-foreground">Parameters</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Adjust the inputs to model your scenario.</p>
             </div>
-            <div className="p-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
-              {inputs.map(({ id, label, unit, min, max, step }) => (
-                <div key={id} className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground block">
-                    {label}
-                    <span className="ml-1 text-muted-foreground/50">{unit}</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={vals[id]}
-                    onChange={(e) => setVals((v) => ({ ...v, [id]: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground font-data text-sm focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary/50 transition-colors"
-                  />
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {inputs.map(({ id, label, unit, min, max, step }) => (
+                  <div key={id} className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground block">
+                      {label}
+                      <span className="ml-1 text-muted-foreground/50">{unit}</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={min}
+                      max={max}
+                      step={step}
+                      value={vals[id]}
+                      onChange={(e) => setVals((v) => ({ ...v, [id]: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground font-data text-sm focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground block">
+                  Withholding tax
+                  <span className="ml-1 text-muted-foreground/50">on dividends</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {TAX_PRESETS.map(({ label, value }) => (
+                    <button
+                      key={label}
+                      onClick={() => setTaxRate(value)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        taxRate === value
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
@@ -149,7 +179,7 @@ export default function SimulatorPage() {
         </div>
 
         <p className="text-xs text-muted-foreground border-t border-border pt-6">
-          For illustration purposes only. Past returns do not guarantee future results. Not investment advice.
+          For illustration purposes only. Dividend amounts shown after withholding tax deduction. Past returns do not guarantee future results. Not investment advice.
         </p>
       </main>
     </div>

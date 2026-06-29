@@ -4,15 +4,8 @@ import Link from "next/link";
 import { SustainabilityBadge } from "./SustainabilityBadge";
 import { ArrowUpDown } from "lucide-react";
 import type { Stock } from "@/types/stock";
+import { fmt, fmtPrice } from "@/lib/format";
 
-function fmt(v: number | null, d = 2, s = "") {
-  if (v === null) return "—";
-  return `${v.toFixed(d)}${s}`;
-}
-function fmtPrice(p: number | null, c: string) {
-  if (p === null) return "—";
-  return new Intl.NumberFormat("de-CH", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(p);
-}
 function yieldColor(y: number | null) {
   if (y === null) return "text-muted-foreground";
   if (y >= 4) return "text-emerald-700";
@@ -79,19 +72,12 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         <table className="w-full">
           <thead>
             <tr className="border-b-2 border-border">
-              {/* Rank */}
               <th className="bg-muted/60 px-3 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider w-10">#</th>
-              {/* Company */}
               <th className="bg-muted/60 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Company</th>
-              {/* Price */}
               <th className="bg-muted/60 px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Price</th>
-              {/* Div/Year — yield group, tinted green */}
               <th className="bg-emerald-50 border-l-2 border-emerald-200 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider hidden sm:table-cell">Div./Year</th>
-              {/* Yield — yield group, primary highlight */}
               <th className="bg-emerald-50 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider">Yield</th>
-              {/* Payout */}
               <th className="bg-muted/60 border-l border-border px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Payout</th>
-              {/* Sustainability */}
               <th className="bg-muted/60 px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Sust.</th>
             </tr>
           </thead>
@@ -106,12 +92,10 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
                 key={s.id}
                 className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors group"
               >
-                {/* Rank */}
                 <td className="px-3 py-4 text-center">
                   <span className="font-data text-xs font-semibold text-muted-foreground/40">{i + 1}</span>
                 </td>
 
-                {/* Company: name (primary link) + ticker chip */}
                 <td className="px-4 py-4">
                   <Link
                     href={`/stock/${encodeURIComponent(s.ticker)}`}
@@ -127,17 +111,14 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
                   </div>
                 </td>
 
-                {/* Price */}
                 <td className="px-4 py-4 text-right font-data text-sm font-medium text-foreground whitespace-nowrap">
                   {fmtPrice(s.currentPrice, s.currency)}
                 </td>
 
-                {/* Div/Year — yield group tint */}
                 <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 border-l-2 border-emerald-100 px-4 py-4 text-right font-data text-sm text-muted-foreground hidden sm:table-cell transition-colors">
                   {s.annualDividend ? fmtPrice(s.annualDividend, s.currency) : "—"}
                 </td>
 
-                {/* Yield — with mini progress bar */}
                 <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 px-4 py-4 transition-colors">
                   <div className="flex flex-col items-end gap-1.5">
                     <span className={`font-data font-bold text-sm ${yieldColor(s.dividendYield)}`}>
@@ -152,12 +133,10 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
                   </div>
                 </td>
 
-                {/* Payout */}
                 <td className="border-l border-border/40 px-4 py-4 text-right font-data text-sm text-muted-foreground hidden md:table-cell">
                   {fmt(s.payoutRatio, 1, "%")}
                 </td>
 
-                {/* Sustainability */}
                 <td className="px-4 py-4 hidden lg:table-cell">
                   <SustainabilityBadge status={s.sustainabilityStatus as never} />
                 </td>

@@ -3,26 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Badge } from "@/components/ui/badge";
 import { GROWTH_TICKERS } from "@/lib/yahoo";
+import { fmt, fmtPrice, fmtMarketCap } from "@/lib/format";
 import { Check, X, TrendingUp, TrendingDown } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-
-function fmt(v: number | null, d = 2, s = "") {
-  if (v === null || v === undefined) return "—";
-  return `${v.toFixed(d)}${s}`;
-}
-function fmtPrice(p: number | null, c: string) {
-  if (!p) return "—";
-  return new Intl.NumberFormat("de-CH", {
-    style: "currency", currency: c, minimumFractionDigits: 2,
-  }).format(p);
-}
-function fmtCap(mc: number | null) {
-  if (!mc) return "—";
-  if (mc >= 1e12) return `${(mc / 1e12).toFixed(1)}T`;
-  if (mc >= 1e9)  return `${(mc / 1e9).toFixed(1)}B`;
-  return `${(mc / 1e6).toFixed(0)}M`;
-}
 
 export default async function WachstumPage() {
   const growthTickers = GROWTH_TICKERS.map((t) => t.ticker);
@@ -144,7 +128,7 @@ export default async function WachstumPage() {
                       {fmt(s.beta, 2)}
                     </td>
                     <td className="px-4 py-4 text-right font-data text-sm text-muted-foreground hidden md:table-cell">
-                      {fmtCap(s.marketCap)}
+                      {fmtMarketCap(s.marketCap)}
                     </td>
                     <td className="px-4 py-4 hidden lg:table-cell">
                       {s.dividendYield && s.dividendYield > 0 && (

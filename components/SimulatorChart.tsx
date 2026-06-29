@@ -3,6 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer,
 } from "recharts";
+import { fmtCHFRound } from "@/lib/format";
 
 interface DataPoint {
   year: number;
@@ -10,11 +11,6 @@ interface DataPoint {
   einzahlungen: number;
   dividenden: number;
 }
-
-const fmtCHF = (v: number) =>
-  new Intl.NumberFormat("de-CH", {
-    style: "currency", currency: "CHF", maximumFractionDigits: 0,
-  }).format(v);
 
 function CustomTooltip({ active, payload, label }: {
   active?: boolean;
@@ -38,7 +34,7 @@ function CustomTooltip({ active, payload, label }: {
             <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0" />
             {names[p.name] ?? p.name}
           </span>
-          <span className="font-data font-semibold text-foreground">{fmtCHF(p.value)}</span>
+          <span className="font-data font-semibold text-foreground">{fmtCHFRound(p.value)}</span>
         </div>
       ))}
     </div>
@@ -77,6 +73,10 @@ export function SimulatorChart({ data }: { data: DataPoint[] }) {
             <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.12} />
             <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.00} />
           </linearGradient>
+          <linearGradient id="gradDividenden" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%"  stopColor="#f59e0b" stopOpacity={0.12} />
+            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.00} />
+          </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="2 4" stroke="rgba(15,23,42,0.06)" />
         <XAxis
@@ -100,6 +100,7 @@ export function SimulatorChart({ data }: { data: DataPoint[] }) {
         <Tooltip content={<CustomTooltip />} />
         <Legend content={<CustomLegend />} />
         <Area type="monotone" dataKey="einzahlungen" stroke="#3b82f6" fill="url(#gradEinzahlungen)" strokeWidth={1.5} dot={false} />
+        <Area type="monotone" dataKey="dividenden"   stroke="#f59e0b" fill="url(#gradDividenden)"   strokeWidth={1.5} dot={false} />
         <Area type="monotone" dataKey="depotwert"    stroke="#059669" fill="url(#gradDepotwert)"    strokeWidth={2}   dot={false} />
       </AreaChart>
     </ResponsiveContainer>

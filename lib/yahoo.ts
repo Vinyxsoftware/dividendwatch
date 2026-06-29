@@ -57,16 +57,28 @@ export const GROWTH_TICKERS: { ticker: string; region: string; exchange: string 
   { ticker: "LONN.SW",   region: "CH", exchange: "SIX" },
 ];
 
+// Compares annualized dividend totals (sum of all payments in a 12-month window)
+// so the result is correct regardless of payment frequency (monthly, quarterly, annual).
 function calcDividendGrowth3Y(history: { exDate: Date; amount: number }[]): number | null {
   if (history.length < 2) return null;
   const sorted = [...history].sort((a, b) => a.exDate.getTime() - b.exDate.getTime());
-  const latest = sorted[sorted.length - 1];
-  const threeYearsAgo = new Date(latest.exDate.getTime() - 3 * 365 * 24 * 60 * 60 * 1000);
-  const candidates = sorted.filter(d => d.exDate <= threeYearsAgo);
-  if (candidates.length === 0) return null;
-  const reference = candidates[candidates.length - 1];
-  if (reference.amount === 0) return null;
-  return ((latest.amount - reference.amount) / reference.amount) * 100;
+  const latest = sorted[sorted.length - 1].exDate;
+
+  const MS_YEAR = 365 * 24 * 60 * 60 * 1000;
+
+  const recentStart = new Date(latest.getTime() - MS_YEAR);
+  const recentAnnual = sorted
+    .filter((d) => d.exDate > recentStart && d.exDate <= latest)
+    .reduce((sum, d) => sum + d.amount, 0);
+
+  const threeYearsAgo = new Date(latest.getTime() - 3 * MS_YEAR);
+  const pastStart = new Date(threeYearsAgo.getTime() - MS_YEAR);
+  const pastAnnual = sorted
+    .filter((d) => d.exDate > pastStart && d.exDate <= threeYearsAgo)
+    .reduce((sum, d) => sum + d.amount, 0);
+
+  if (recentAnnual === 0 || pastAnnual === 0) return null;
+  return ((recentAnnual - pastAnnual) / pastAnnual) * 100;
 }
 
 function detectFrequency(dates: Date[]): string {
@@ -97,7 +109,8 @@ export async function fetchDividendHistory(ticker: string) {
     if (divs.length === 0) return [];
     const frequency = detectFrequency(divs.map((d) => d.date));
     return divs.map((d) => ({ exDate: d.date, amount: d.amount, frequency }));
-  } catch {
+  } catch (error) {
+    console.error(`[fetchDividendHistory] ${ticker}:`, error);
     return [];
   }
 }
@@ -122,6 +135,8 @@ export async function fetchStockData(ticker: string) {
     const dividendGrowth3Y = calcDividendGrowth3Y(dividendHistory);
     const sustainabilityStatus = calcSustainability(payoutRatio, dividendGrowth3Y);
 
+    void stats;
+
     return {
       name: quote.longName ?? quote.shortName ?? ticker,
       currency: quote.currency ?? "USD",
@@ -138,7 +153,8 @@ export async function fetchStockData(ticker: string) {
       debtToEquity: financial?.debtToEquity ?? null,
       sustainabilityStatus,
     };
-  } catch {
+  } catch (error) {
+    console.error(`[fetchStockData] ${ticker}:`, error);
     return null;
   }
 }

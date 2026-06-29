@@ -46,12 +46,18 @@ model Dividend {
   frequency String
   yield     Float?
   createdAt DateTime  @default(now())
+
+  @@index([stockId])
 }
 
+// TODO: PriceSnapshot is intended for future historical chart features
+// (e.g. daily closing price timeline per stock). Not yet written to or queried.
 model PriceSnapshot {
   id      String   @id @default(cuid())
   stockId String
   stock   Stock    @relation(fields: [stockId], references: [id])
   price   Float
   date    DateTime
+
+  @@index([stockId])
 }
