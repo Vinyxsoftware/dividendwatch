@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { fmt, fmtPrice, fmtMarketCap } from "@/lib/format";
 import { DollarSign, Percent, BarChart2, Scale, TrendingUp, ShieldCheck, Globe, Building2, CalendarDays } from "lucide-react";
 import type { Stock } from "@/types/stock";
+import { DividendHistoryChart } from "@/components/DividendHistoryChart";
 
 export const dynamic = "force-dynamic";
 
@@ -214,6 +215,11 @@ export default async function StockDetailPage({
                   <CalendarDays className="w-4 h-4 text-muted-foreground" />
                   <h2 className="text-sm font-semibold text-foreground">Dividend History</h2>
                 </div>
+                {stock.dividends.length >= 2 && (
+                  <div className="px-3 pt-4">
+                    <DividendHistoryChart dividends={stock.dividends} />
+                  </div>
+                )}
                 <div className="divide-y divide-border/50">
                   {stock.dividends.map((d, i) => (
                     <div key={d.id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/30 transition-colors">

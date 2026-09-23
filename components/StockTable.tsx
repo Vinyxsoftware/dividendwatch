@@ -2,9 +2,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SustainabilityBadge } from "./SustainabilityBadge";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Download } from "lucide-react";
 import type { Stock } from "@/types/stock";
 import { fmt, fmtPrice } from "@/lib/format";
+import { stocksToCSV, downloadFile } from "@/lib/export";
 
 function yieldColor(y: number | null) {
   if (y === null) return "text-muted-foreground";
@@ -65,6 +66,29 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
           {sort === "dividendYield" ? "Sorted by Yield" : "Sorted by Price"}
         </button>
         <span className="ml-auto text-xs text-muted-foreground font-data">{filtered.length} stocks</span>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => {
+              const date = new Date().toISOString().slice(0, 10);
+              downloadFile(stocksToCSV(filtered), `dividendwatch-${date}.csv`, "text/csv;charset=utf-8;");
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Download className="w-3 h-3" />
+            CSV
+          </button>
+          <button
+            onClick={() => {
+              const date = new Date().toISOString().slice(0, 10);
+              downloadFile(JSON.stringify(filtered, null, 2), `dividendwatch-${date}.json`, "application/json;charset=utf-8;");
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Download className="w-3 h-3" />
+            JSON
+          </button>
+        </div>
       </div>
 
       {/* Table */}
