@@ -85,6 +85,38 @@ export default async function StockDetailPage({
         "Recovery effort often exceeds the tax saving for small amounts.",
       ],
     },
+    AT: {
+      title: "Austrian Stock",
+      items: [
+        "Austrian withholding tax (KESt): 27.5% deducted at source.",
+        "Reduced to ~15% for Swiss residents under the CH–AT tax treaty (DBA).",
+        "The reduction is usually a refund claim, not automatic — ask your broker/bank.",
+      ],
+    },
+    UK: {
+      title: "UK Stock",
+      items: [
+        "The UK levies no dividend withholding tax on ordinary shares, for any shareholder.",
+        "You still owe regular income tax on dividends received under your own tax residency rules.",
+        "No treaty reclaim needed — there's nothing withheld to reclaim.",
+      ],
+    },
+    SE: {
+      title: "Swedish Stock",
+      items: [
+        "Swedish withholding tax: 30% standard rate, deducted at source.",
+        "Reduced to 15% for Swiss residents under the CH–SE tax treaty (DBA).",
+        "Reclaiming the difference is a separate application — not automatic.",
+      ],
+    },
+    DK: {
+      title: "Danish Stock",
+      items: [
+        "Danish withholding tax: 27% standard rate, deducted at source.",
+        "Reduced to 15% for Swiss residents under the CH–DK tax treaty (DBA).",
+        "Reclaiming the difference is a separate application — not automatic.",
+      ],
+    },
   };
   const tax = stock.region ? taxInfo[stock.region] : null;
 

@@ -20,19 +20,23 @@ function yieldBarColor(y: number | null) {
   return "bg-muted-foreground/30";
 }
 
-const regions = [
-  { value: "all", label: "All" },
-  { value: "CH",  label: "Switzerland" },
-  { value: "EU",  label: "Europe" },
-  { value: "US",  label: "USA" },
+const regions: { value: string; label: string; match: string[] | null }[] = [
+  { value: "all", label: "All",          match: null },
+  { value: "CH",  label: "Switzerland",  match: ["CH"] },
+  { value: "AT",  label: "Austria",      match: ["AT"] },
+  { value: "EU",  label: "Europe",       match: ["EU"] },
+  { value: "UK",  label: "UK",           match: ["UK"] },
+  { value: "NORD",label: "Nordics",      match: ["SE", "DK", "NO"] },
+  { value: "US",  label: "USA",          match: ["US"] },
 ];
 
 export function StockTable({ stocks }: { stocks: Stock[] }) {
   const [region, setRegion] = useState("all");
   const [sort, setSort]     = useState("dividendYield");
 
+  const activeMatch = regions.find((r) => r.value === region)?.match ?? null;
   const filtered = stocks
-    .filter((s) => region === "all" || s.region === region)
+    .filter((s) => activeMatch === null || (s.region !== null && activeMatch.includes(s.region)))
     .sort((a, b) => {
       if (sort === "dividendYield") return (b.dividendYield ?? 0) - (a.dividendYield ?? 0);
       if (sort === "price") return (a.currentPrice ?? 9999) - (b.currentPrice ?? 9999);
@@ -43,7 +47,7 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
     <div className="space-y-3">
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-muted border border-border">
+        <div className="flex flex-wrap items-center gap-1 p-1 rounded-lg bg-muted border border-border">
           {regions.map((r) => (
             <button
               key={r.value}

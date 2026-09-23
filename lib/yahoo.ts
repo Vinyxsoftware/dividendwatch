@@ -12,6 +12,22 @@ export const TOP_DIVIDEND_TICKERS: { ticker: string; region: string; exchange: s
   { ticker: "UBSG.SW", region: "CH", exchange: "SIX" },
   { ticker: "ZURN.SW", region: "CH", exchange: "SIX" },
   { ticker: "SREN.SW", region: "CH", exchange: "SIX" },
+  { ticker: "SCMN.SW", region: "CH", exchange: "SIX" },
+  { ticker: "SLHN.SW", region: "CH", exchange: "SIX" },
+  { ticker: "PGHN.SW", region: "CH", exchange: "SIX" },
+  { ticker: "ADEN.SW", region: "CH", exchange: "SIX" },
+  { ticker: "BCGE.SW", region: "CH", exchange: "SIX" },
+  // Österreich
+  { ticker: "OMV.VI",  region: "AT", exchange: "VIE" },
+  { ticker: "VIG.VI",  region: "AT", exchange: "VIE" },
+  { ticker: "EBS.VI",  region: "AT", exchange: "VIE" },
+  // Grossbritannien (LSE quotes price/dividend in pence — normalized to GBP in fetchStockData/fetchDividendHistory)
+  { ticker: "HSBA.L",  region: "UK", exchange: "LSE" },
+  { ticker: "ULVR.L",  region: "UK", exchange: "LSE" },
+  { ticker: "GSK.L",   region: "UK", exchange: "LSE" },
+  // Skandinavien
+  { ticker: "NOVO-B.CO", region: "DK", exchange: "CPH" },
+  { ticker: "VOLV-B.ST", region: "SE", exchange: "STO" },
   // Europa
   { ticker: "ALV.DE",  region: "EU", exchange: "XETRA" },
   { ticker: "BAYN.DE", region: "EU", exchange: "XETRA" },
@@ -23,6 +39,12 @@ export const TOP_DIVIDEND_TICKERS: { ticker: string; region: string; exchange: s
   { ticker: "ASML.AS", region: "EU", exchange: "AMS" },
   { ticker: "SHELL.AS",region: "EU", exchange: "AMS" },
   { ticker: "TTE.PA",  region: "EU", exchange: "EPA" },
+  { ticker: "BEI.DE",  region: "EU", exchange: "XETRA" },
+  { ticker: "VOW3.DE", region: "EU", exchange: "XETRA" },
+  { ticker: "DBK.DE",  region: "EU", exchange: "XETRA" },
+  { ticker: "DHL.DE",  region: "EU", exchange: "XETRA" },
+  { ticker: "RWE.DE",  region: "EU", exchange: "XETRA" },
+  { ticker: "EOAN.DE", region: "EU", exchange: "XETRA" },
   // USA
   { ticker: "JNJ",     region: "US", exchange: "NYSE" },
   { ticker: "PG",      region: "US", exchange: "NYSE" },
@@ -102,10 +124,13 @@ export async function fetchDividendHistory(ticker: string) {
       { period1: "2014-01-01", period2: new Date(), events: "div", interval: "1mo" },
       { validateResult: false }
     );
+    // Same GBp/GBX (pence) quirk as fetchStockData — see comment there.
+    const isPence = result?.meta?.currency === "GBp" || result?.meta?.currency === "GBX";
     const divMap = result?.events?.dividends ?? {};
-    const divs: { date: Date; amount: number }[] = Object.values(divMap).map(
-      (d: unknown) => ({ date: new Date((d as { date: string }).date), amount: (d as { amount: number }).amount })
-    );
+    const divs: { date: Date; amount: number }[] = Object.values(divMap).map((d: unknown) => {
+      const raw = d as { date: string; amount: number };
+      return { date: new Date(raw.date), amount: isPence ? raw.amount / 100 : raw.amount };
+    });
     if (divs.length === 0) return [];
     const frequency = detectFrequency(divs.map((d) => d.date));
     return divs.map((d) => ({ exDate: d.date, amount: d.amount, frequency }));
@@ -126,8 +151,17 @@ export async function fetchStockData(ticker: string) {
     const stats = summary.defaultKeyStatistics;
     const financial = summary.financialData;
 
+    // LSE (London) tickers quote price/dividend-per-share in pence (GBp/GBX),
+    // not pounds, while marketCap and ratios are already pound-denominated.
+    // Normalize to GBP so `currency` stays a valid ISO 4217 code (GBp/GBX
+    // would throw in Intl.NumberFormat) and prices/dividends aren't 100x off.
+    const isPence = quote.currency === "GBp" || quote.currency === "GBX";
+    const currency = isPence ? "GBP" : (quote.currency ?? "USD");
+    const penceToUnit = (v: number | null | undefined) =>
+      typeof v === "number" ? (isPence ? v / 100 : v) : null;
+
     const dividendYield = detail?.dividendYield ? detail.dividendYield * 100 : null;
-    const annualDividend = detail?.dividendRate ?? null;
+    const annualDividend = penceToUnit(detail?.dividendRate);
     const payoutRatio = detail?.payoutRatio ? detail.payoutRatio * 100 : null;
     const peRatio = detail?.trailingPE ?? null;
     const beta = detail?.beta ?? null;
@@ -139,8 +173,8 @@ export async function fetchStockData(ticker: string) {
 
     return {
       name: quote.longName ?? quote.shortName ?? ticker,
-      currency: quote.currency ?? "USD",
-      currentPrice: quote.regularMarketPrice ?? null,
+      currency,
+      currentPrice: penceToUnit(quote.regularMarketPrice),
       marketCap: quote.marketCap ?? null,
       peRatio: typeof peRatio === "number" ? peRatio : null,
       beta: typeof beta === "number" ? beta : null,
