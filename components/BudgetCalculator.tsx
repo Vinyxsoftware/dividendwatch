@@ -2,20 +2,7 @@
 import { useState } from "react";
 import type { Stock } from "@/types/stock";
 import { fmtCHF } from "@/lib/format";
-
-// Approximate exchange rates: 1 unit of foreign currency in CHF.
-// Used only for share-count estimation — not suitable for financial decisions.
-const FX_TO_CHF: Record<string, number> = {
-  CHF: 1.00,
-  EUR: 1.05,
-  USD: 0.90,
-  GBP: 1.13,
-  DKK: 0.14,
-};
-
-function toCHF(amount: number, currency: string): number {
-  return amount * (FX_TO_CHF[currency] ?? 1.0);
-}
+import { toCHF } from "@/lib/fx";
 
 export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
   const [budget, setBudget] = useState("500");

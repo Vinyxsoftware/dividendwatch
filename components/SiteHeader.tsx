@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { TrendingUp, BarChart2, Rocket, Sun, Moon } from "lucide-react";
+import { TrendingUp, BarChart2, Rocket, Sun, Moon, Wallet } from "lucide-react";
 
 const nav = [
+  { href: "/portfolio", label: "Portfolio", icon: Wallet },
   { href: "/simulator", label: "Simulator", icon: BarChart2 },
   { href: "/wachstum",  label: "Growth",    icon: Rocket },
 ];
@@ -52,14 +53,15 @@ export function SiteHeader() {
                   <Link
                     key={href}
                     href={href}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                    aria-label={label}
+                    className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-sm transition-colors ${
                       active
                         ? "bg-primary/10 text-primary font-medium"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
-                    {label}
+                    <span className="hidden sm:inline">{label}</span>
                   </Link>
                 );
               })}

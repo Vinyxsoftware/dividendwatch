@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StockTable } from "@/components/StockTable";
 import { BudgetCalculator } from "@/components/BudgetCalculator";
-import { BarChart2, Rocket, ArrowRight } from "lucide-react";
+import { BarChart2, Rocket, ArrowRight, Wallet } from "lucide-react";
 import Link from "next/link";
 import type { Stock } from "@/types/stock";
 
@@ -77,6 +77,27 @@ export default async function Home() {
 
             {/* Feature cards — right column */}
             <div className="flex flex-col gap-4">
+              <Link
+                href="/portfolio"
+                className="group flex-1 flex flex-col justify-between p-6 rounded-xl border border-border bg-card hover:border-primary/30 hover:shadow-md transition-all"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Wallet className="w-5 h-5 text-primary" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground/30 group-hover:translate-x-0.5 group-hover:text-primary transition-all mt-1" />
+                </div>
+                <div className="mt-4">
+                  <div className="text-sm font-semibold text-foreground">My Portfolio</div>
+                  <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    Track your own holdings and see your real annual and monthly dividend income. No account needed.
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 mt-4 text-xs font-medium text-primary">
+                  Open portfolio <ArrowRight className="w-3 h-3" />
+                </div>
+              </Link>
+
               <Link
                 href="/simulator"
                 className="group flex-1 flex flex-col justify-between p-6 rounded-xl border border-border bg-card hover:border-primary/30 hover:shadow-md transition-all"
