@@ -151,17 +151,20 @@ export async function fetchStockData(ticker: string) {
     const stats = summary.defaultKeyStatistics;
     const financial = summary.financialData;
 
-    // LSE (London) tickers quote price/dividend-per-share in pence (GBp/GBX),
-    // not pounds, while marketCap and ratios are already pound-denominated.
-    // Normalize to GBP so `currency` stays a valid ISO 4217 code (GBp/GBX
-    // would throw in Intl.NumberFormat) and prices/dividends aren't 100x off.
+    // LSE (London) tickers quote `regularMarketPrice` in pence (GBp/GBX), not
+    // pounds — but summaryDetail.dividendRate, marketCap and all ratios are
+    // already pound-denominated (a genuine inconsistency between Yahoo's
+    // quote and quoteSummary endpoints, confirmed against real HSBA.L/ULVR.L
+    // yield math: dividing dividendRate by 100 here previously made
+    // "annual dividend" ~100x too small). Only the raw quote price needs
+    // converting. `currency` itself still needs normalizing to "GBP" so it
+    // stays a valid ISO 4217 code — "GBp"/"GBX" would throw in
+    // Intl.NumberFormat.
     const isPence = quote.currency === "GBp" || quote.currency === "GBX";
     const currency = isPence ? "GBP" : (quote.currency ?? "USD");
-    const penceToUnit = (v: number | null | undefined) =>
-      typeof v === "number" ? (isPence ? v / 100 : v) : null;
 
     const dividendYield = detail?.dividendYield ? detail.dividendYield * 100 : null;
-    const annualDividend = penceToUnit(detail?.dividendRate);
+    const annualDividend = detail?.dividendRate ?? null;
     const payoutRatio = detail?.payoutRatio ? detail.payoutRatio * 100 : null;
     const peRatio = detail?.trailingPE ?? null;
     const beta = detail?.beta ?? null;
@@ -174,7 +177,9 @@ export async function fetchStockData(ticker: string) {
     return {
       name: quote.longName ?? quote.shortName ?? ticker,
       currency,
-      currentPrice: penceToUnit(quote.regularMarketPrice),
+      currentPrice: typeof quote.regularMarketPrice === "number"
+        ? (isPence ? quote.regularMarketPrice / 100 : quote.regularMarketPrice)
+        : null,
       marketCap: quote.marketCap ?? null,
       peRatio: typeof peRatio === "number" ? peRatio : null,
       beta: typeof beta === "number" ? beta : null,
