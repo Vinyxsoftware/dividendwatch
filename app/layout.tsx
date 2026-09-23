@@ -20,9 +20,30 @@ const syne = Syne({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const SITE_URL = "https://dividendwatch.vercel.app";
+const SITE_NAME = "DividendWatch";
+const SITE_DESCRIPTION =
+  "Yield rankings, sustainability scores, and tax guidance for dividend investors in Switzerland, Germany, and Austria.";
+
 export const metadata: Metadata = {
-  title: "DividendWatch — Dividend Stocks for Retail Investors",
-  description: "Yield rankings, sustainability scores, and tax guidance for dividend investors in Switzerland, Germany, and Austria.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — Dividend Stocks for Retail Investors`,
+    template: `%s — ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: `${SITE_NAME} — Dividend Stocks for Retail Investors`,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: `${SITE_NAME} — Dividend Stocks for Retail Investors`,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

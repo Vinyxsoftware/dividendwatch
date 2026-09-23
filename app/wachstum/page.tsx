@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,15 @@ import { fmt, fmtPrice, fmtMarketCap } from "@/lib/format";
 import { Check, X, TrendingUp, TrendingDown } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Growth Stocks",
+  description: "High-growth stocks with little or no dividend. Compare capital appreciation vs. dividend income strategies.",
+  openGraph: {
+    title: "Growth Stocks — DividendWatch",
+    description: "High-growth stocks with little or no dividend. Compare capital appreciation vs. dividend income strategies.",
+  },
+};
 
 export default async function WachstumPage() {
   const growthTickers = GROWTH_TICKERS.map((t) => t.ticker);

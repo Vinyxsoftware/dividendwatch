@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SustainabilityBadge } from "@/components/SustainabilityBadge";
@@ -8,6 +9,29 @@ import { DollarSign, Percent, BarChart2, Scale, TrendingUp, ShieldCheck, Globe, 
 import type { Stock } from "@/types/stock";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ ticker: string }>;
+}): Promise<Metadata> {
+  const { ticker } = await params;
+  const stock = await prisma.stock.findUnique({ where: { ticker: decodeURIComponent(ticker) } });
+  if (!stock) return {};
+
+  const yieldText = stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "—";
+  const title = `${stock.name} (${stock.ticker})`;
+  const description = `Dividend yield ${yieldText}, payout ratio ${
+    stock.payoutRatio !== null ? `${stock.payoutRatio.toFixed(0)}%` : "—"
+  }. Sustainability: ${stock.sustainabilityStatus ?? "unrated"}. Swiss/DACH tax guidance included.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/stock/${encodeURIComponent(stock.ticker)}` },
+    openGraph: { title: `${title} — DividendWatch`, description, type: "article" },
+  };
+}
 
 export default async function StockDetailPage({
   params,
