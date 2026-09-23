@@ -16,8 +16,8 @@ export default function Error({
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
-      <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
-        <AlertTriangle className="w-5 h-5 text-red-500" />
+      <div className="w-12 h-12 rounded-full bg-red-50 dark:bg-red-950/40 flex items-center justify-center">
+        <AlertTriangle className="w-5 h-5 text-red-500 dark:text-red-400" />
       </div>
       <div className="space-y-1.5">
         <h1 className="font-display font-bold text-2xl text-foreground">Data temporarily unavailable</h1>

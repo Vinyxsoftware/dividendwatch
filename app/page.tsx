@@ -45,11 +45,11 @@ export default async function Home() {
               <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1.5">Stocks tracked</div>
             </div>
             <div className="bg-card px-5 py-4">
-              <div className="font-data text-3xl font-bold text-emerald-700 leading-none">{avgYield}%</div>
+              <div className="font-data text-3xl font-bold text-emerald-700 dark:text-emerald-400 leading-none">{avgYield}%</div>
               <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1.5">Avg. yield</div>
             </div>
             <div className="bg-card px-5 py-4">
-              <div className="font-data text-3xl font-bold text-emerald-700 leading-none">{topYield}%</div>
+              <div className="font-data text-3xl font-bold text-emerald-700 dark:text-emerald-400 leading-none">{topYield}%</div>
               <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1.5">Top yield</div>
             </div>
             <div className="bg-card px-5 py-4">
@@ -100,13 +100,13 @@ export default async function Home() {
 
               <Link
                 href="/wachstum"
-                className="group flex-1 flex flex-col justify-between p-6 rounded-xl border border-border bg-card hover:border-blue-300/60 hover:shadow-md transition-all"
+                className="group flex-1 flex flex-col justify-between p-6 rounded-xl border border-border bg-card hover:border-blue-300/60 dark:hover:border-blue-800 hover:shadow-md transition-all"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                    <Rocket className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center shrink-0">
+                    <Rocket className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground/30 group-hover:translate-x-0.5 group-hover:text-blue-600 transition-all mt-1" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground/30 group-hover:translate-x-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all mt-1" />
                 </div>
                 <div className="mt-4">
                   <div className="text-sm font-semibold text-foreground">Growth Stocks</div>
@@ -114,7 +114,7 @@ export default async function Home() {
                     Not every portfolio needs dividends. Explore high-growth stocks and compare capital appreciation vs. income strategies.
                   </div>
                 </div>
-                <div className="flex items-center gap-1 mt-4 text-xs font-medium text-blue-600">
+                <div className="flex items-center gap-1 mt-4 text-xs font-medium text-blue-600 dark:text-blue-400">
                   Explore growth <ArrowRight className="w-3 h-3" />
                 </div>
               </Link>

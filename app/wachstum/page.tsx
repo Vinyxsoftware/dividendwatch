@@ -47,18 +47,18 @@ export default async function WachstumPage() {
             {
               label: "Dividend Strategy",
               icon: TrendingUp,
-              color: "text-emerald-700",
-              iconBg: "bg-emerald-50",
-              iconColor: "text-emerald-600",
+              color: "text-emerald-700 dark:text-emerald-400",
+              iconBg: "bg-emerald-50 dark:bg-emerald-950/40",
+              iconColor: "text-emerald-600 dark:text-emerald-400",
               pros: ["Regular passive income", "Stable, established companies", "Good for retirement / cash flow"],
               cons: ["Lower price appreciation", "Withholding tax deductions"],
             },
             {
               label: "Growth Strategy",
               icon: TrendingDown,
-              color: "text-blue-600",
-              iconBg: "bg-blue-50",
-              iconColor: "text-blue-600",
+              color: "text-blue-600 dark:text-blue-400",
+              iconBg: "bg-blue-50 dark:bg-blue-950/40",
+              iconColor: "text-blue-600 dark:text-blue-400",
               pros: ["Higher price appreciation potential", "Reinvestment instead of dividends", "Ideal for long time horizons"],
               cons: ["Higher volatility", "No passive income"],
             },
@@ -142,7 +142,7 @@ export default async function WachstumPage() {
                     </td>
                     <td className="px-4 py-4 hidden lg:table-cell">
                       {s.dividendYield && s.dividendYield > 0 && (
-                        <Badge variant="outline" className="text-xs border-primary/25 text-primary bg-primary/[0.07]">
+                        <Badge variant="outline" className="text-xs border-primary/25 text-primary bg-primary/[0.07] dark:bg-primary/[0.12]">
                           {fmt(s.dividendYield, 2, "% div.")}
                         </Badge>
                       )}

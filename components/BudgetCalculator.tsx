@@ -90,7 +90,7 @@ export function BudgetCalculator({ stocks }: { stocks: Stock[] }) {
             {results.map(({ label, value, highlight }) => (
               <div key={label} className="flex items-baseline justify-between py-3 first:pt-0 last:pb-0">
                 <span className="text-xs text-muted-foreground">{label}</span>
-                <span className={`font-data font-bold text-lg ${highlight ? "text-emerald-700" : "text-foreground"}`}>
+                <span className={`font-data font-bold text-lg ${highlight ? "text-emerald-700 dark:text-emerald-400" : "text-foreground"}`}>
                   {value}
                 </span>
               </div>

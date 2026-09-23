@@ -71,10 +71,10 @@ export function SimulatorClient() {
   const profit = (last?.depotwert ?? 0) - (last?.einzahlungen ?? 0);
 
   const results = [
-    { label: `Portfolio after ${vals.years} yr`,  value: fmtCHFRound(last?.depotwert ?? 0),    color: "text-emerald-700", icon: TrendingUp },
-    { label: "Total contributions",               value: fmtCHFRound(last?.einzahlungen ?? 0),  color: "text-blue-600",    icon: DollarSign },
+    { label: `Portfolio after ${vals.years} yr`,  value: fmtCHFRound(last?.depotwert ?? 0),    color: "text-emerald-700 dark:text-emerald-400", icon: TrendingUp },
+    { label: "Total contributions",               value: fmtCHFRound(last?.einzahlungen ?? 0),  color: "text-blue-600 dark:text-blue-400",    icon: DollarSign },
     { label: "Cumulative dividends (net)",        value: fmtCHFRound(last?.dividenden ?? 0),    color: "text-foreground",  icon: PiggyBank  },
-    { label: "Total gain",                        value: fmtCHFRound(profit),                   color: profit > 0 ? "text-emerald-700" : "text-red-600", icon: Sparkles },
+    { label: "Total gain",                        value: fmtCHFRound(profit),                   color: profit > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-600 dark:text-red-400", icon: Sparkles },
   ];
 
   return (

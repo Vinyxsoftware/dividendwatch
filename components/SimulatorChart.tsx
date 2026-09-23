@@ -1,4 +1,5 @@
 "use client";
+import { useTheme } from "next-themes";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer,
@@ -61,6 +62,11 @@ function CustomLegend({ payload }: { payload?: { value: string; color: string }[
 }
 
 export function SimulatorChart({ data }: { data: DataPoint[] }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const gridStroke = isDark ? "rgba(226,232,240,0.08)" : "rgba(15,23,42,0.06)";
+  const tickFill = isDark ? "#94a3b8" : "#64748b";
+
   return (
     <ResponsiveContainer width="100%" height={320}>
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
@@ -78,16 +84,16 @@ export function SimulatorChart({ data }: { data: DataPoint[] }) {
             <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.00} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="2 4" stroke="rgba(15,23,42,0.06)" />
+        <CartesianGrid strokeDasharray="2 4" stroke={gridStroke} />
         <XAxis
           dataKey="year"
-          tick={{ fontSize: 11, fill: "#64748b", fontFamily: "var(--font-jetbrains-mono)" }}
+          tick={{ fontSize: 11, fill: tickFill, fontFamily: "var(--font-jetbrains-mono)" }}
           tickLine={false}
           axisLine={false}
           tickFormatter={(v) => `Y${v}`}
         />
         <YAxis
-          tick={{ fontSize: 11, fill: "#64748b", fontFamily: "var(--font-jetbrains-mono)" }}
+          tick={{ fontSize: 11, fill: tickFill, fontFamily: "var(--font-jetbrains-mono)" }}
           tickLine={false}
           axisLine={false}
           tickFormatter={(v) => {

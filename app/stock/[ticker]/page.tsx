@@ -122,7 +122,7 @@ export default async function StockDetailPage({
                 {fmtPrice(stock.currentPrice, stock.currency)}
               </div>
               {stock.dividendYield !== null && (
-                <div className="font-data font-semibold text-xl text-emerald-700">
+                <div className="font-data font-semibold text-xl text-emerald-700 dark:text-emerald-400">
                   {fmt(stock.dividendYield, 2, "% yield")}
                 </div>
               )}
@@ -146,12 +146,12 @@ export default async function StockDetailPage({
                   key={label}
                   className={`rounded-xl border p-4 shadow-sm ${
                     highlight
-                      ? "border-primary/20 bg-primary/[0.03]"
+                      ? "border-primary/20 bg-primary/[0.03] dark:bg-primary/[0.08]"
                       : "border-border bg-card"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 mb-3 ${highlight ? "text-emerald-600" : "text-muted-foreground"}`} />
-                  <div className={`font-data text-xl font-bold leading-none ${highlight ? "text-emerald-700" : "text-foreground"}`}>
+                  <Icon className={`w-4 h-4 mb-3 ${highlight ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`} />
+                  <div className={`font-data text-xl font-bold leading-none ${highlight ? "text-emerald-700 dark:text-emerald-400" : "text-foreground"}`}>
                     {value}
                   </div>
                   <div className="text-xs text-muted-foreground uppercase tracking-wider mt-2">{label}</div>

@@ -8,14 +8,14 @@ import { fmt, fmtPrice } from "@/lib/format";
 
 function yieldColor(y: number | null) {
   if (y === null) return "text-muted-foreground";
-  if (y >= 4) return "text-emerald-700";
-  if (y >= 2) return "text-blue-600";
+  if (y >= 4) return "text-emerald-700 dark:text-emerald-400";
+  if (y >= 2) return "text-blue-600 dark:text-blue-400";
   return "text-muted-foreground";
 }
 function yieldBarColor(y: number | null) {
   if (y === null || y <= 0) return "bg-muted-foreground/20";
-  if (y >= 4) return "bg-emerald-500";
-  if (y >= 2) return "bg-blue-400";
+  if (y >= 4) return "bg-emerald-500 dark:bg-emerald-400";
+  if (y >= 2) return "bg-blue-400 dark:bg-blue-500";
   return "bg-muted-foreground/30";
 }
 
@@ -75,8 +75,8 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
               <th className="bg-muted/60 px-3 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider w-10">#</th>
               <th className="bg-muted/60 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Company</th>
               <th className="bg-muted/60 px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Price</th>
-              <th className="bg-emerald-50 border-l-2 border-emerald-200 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider hidden sm:table-cell">Div./Year</th>
-              <th className="bg-emerald-50 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider">Yield</th>
+              <th className="bg-emerald-50 border-l-2 border-emerald-200 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider hidden sm:table-cell dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-400">Div./Year</th>
+              <th className="bg-emerald-50 px-4 py-3 text-right text-xs font-semibold text-emerald-700 uppercase tracking-wider dark:bg-emerald-950/30 dark:text-emerald-400">Yield</th>
               <th className="bg-muted/60 border-l border-border px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Payout</th>
               <th className="bg-muted/60 px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Sust.</th>
             </tr>
@@ -115,16 +115,16 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
                   {fmtPrice(s.currentPrice, s.currency)}
                 </td>
 
-                <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 border-l-2 border-emerald-100 px-4 py-4 text-right font-data text-sm text-muted-foreground hidden sm:table-cell transition-colors">
+                <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 border-l-2 border-emerald-100 px-4 py-4 text-right font-data text-sm text-muted-foreground hidden sm:table-cell transition-colors dark:bg-emerald-950/15 dark:group-hover:bg-emerald-950/25 dark:border-emerald-900">
                   {s.annualDividend ? fmtPrice(s.annualDividend, s.currency) : "—"}
                 </td>
 
-                <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 px-4 py-4 transition-colors">
+                <td className="bg-emerald-50/40 group-hover:bg-emerald-50/60 px-4 py-4 transition-colors dark:bg-emerald-950/15 dark:group-hover:bg-emerald-950/25">
                   <div className="flex flex-col items-end gap-1.5">
                     <span className={`font-data font-bold text-sm ${yieldColor(s.dividendYield)}`}>
                       {s.dividendYield !== null ? `${s.dividendYield.toFixed(2)}%` : "—"}
                     </span>
-                    <div className="w-16 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+                    <div className="w-16 h-1.5 bg-emerald-100 dark:bg-emerald-900 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${yieldBarColor(s.dividendYield)}`}
                         style={{ width: `${Math.min(((s.dividendYield ?? 0) / 10) * 100, 100)}%` }}
