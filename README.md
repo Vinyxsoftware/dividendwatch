@@ -42,7 +42,7 @@ No ads. No paywalls. No data selling. Just clean, fast, honest financial data.
 ## Features
 
 ### Dividend Rankings
-Browse and filter **40+ dividend stocks** from Swiss (SIX), European (XETRA, AMS, EPA), and US (NYSE, NASDAQ) exchanges — sorted by yield, filtered by region.
+Browse and filter **67 dividend stocks** from Swiss (SIX), European (XETRA, AMS, EPA), Austrian (Vienna), UK (LSE), and Scandinavian (Nasdaq Stockholm, Nasdaq Copenhagen) exchanges, plus US (NYSE, NASDAQ) — sorted by yield, filtered by region.
 
 ### Sustainability Scoring
 Each stock gets a sustainability badge based on payout ratio and dividend growth history:
@@ -61,6 +61,18 @@ Side-by-side comparison of **Dividend vs. Growth strategies** with a grid of top
 
 ### Swiss Tax Guidance
 Every stock detail page includes **jurisdiction-specific tax notes** — Swiss Verrechnungssteuer, US withholding tax under the DBA treaty, EU per-country rates — so you know your real after-tax return.
+
+### Dark Mode
+System-aware dark mode powered by `next-themes`, with a manual toggle in the header — respects your OS preference by default and remembers your choice.
+
+### Portfolio Tracker
+Track your own holdings at `/portfolio` — add tickers and share counts to see your live position value and dividend income across currencies. Stored entirely in your browser via `zustand` + `localStorage`, no login or database required.
+
+### Historical Dividend Chart
+Every stock detail page includes a Recharts line chart of dividend payments over time, built from the same dividend history data that powers the sustainability score.
+
+### CSV / JSON Export
+Export the currently filtered and sorted stock table to CSV or JSON with one click — handy for your own spreadsheets or further analysis.
 
 ---
 
@@ -144,9 +156,12 @@ Open [http://localhost:3000](http://localhost:3000) — you should see the full 
 dividendwatch/
 ├── app/
 │   ├── page.tsx              # Homepage — rankings + budget calculator
+│   ├── portfolio/page.tsx    # Portfolio tracker — your own holdings
 │   ├── simulator/page.tsx    # DRIP savings plan simulator
 │   ├── wachstum/page.tsx     # Growth stocks comparison
 │   ├── stock/[ticker]/       # Stock detail page
+│   ├── error.tsx             # Route error boundary
+│   ├── loading.tsx           # Route loading skeleton
 │   └── api/
 │       ├── stocks/           # REST endpoint — list + detail
 │       └── refresh/          # Trigger data refresh from Yahoo Finance
@@ -155,11 +170,17 @@ dividendwatch/
 │   ├── StockTable.tsx        # Filterable dividend ranking table
 │   ├── BudgetCalculator.tsx  # Interactive budget → dividend calculator
 │   ├── SimulatorChart.tsx    # Recharts DRIP area chart
+│   ├── DividendHistoryChart.tsx # Recharts dividend history line chart
+│   ├── PortfolioClient.tsx   # Portfolio tracker UI
+│   ├── ThemeProvider.tsx     # next-themes dark mode provider
 │   └── SustainabilityBadge.tsx
 ├── lib/
 │   ├── prisma.ts             # Prisma client singleton
 │   ├── yahoo.ts              # Yahoo Finance fetcher + ticker list
-│   └── calculations.ts       # Sustainability scoring logic
+│   ├── calculations.ts       # Sustainability scoring logic
+│   ├── export.ts             # CSV/JSON export helpers
+│   ├── fx.ts                 # Approximate FX rates for cross-currency totals
+│   └── portfolioStore.ts     # zustand store for portfolio holdings (localStorage)
 ├── prisma/
 │   └── schema.prisma         # Stock, Dividend, PriceSnapshot models
 └── scripts/
@@ -204,12 +225,9 @@ Contributions are what make open source great. All contributions are welcome —
 
 ### Ideas we'd love help with
 
-- [ ] Dark/light theme toggle
-- [ ] Portfolio tracker (add your own holdings)
 - [ ] Email/webhook alerts for dividend date reminders
-- [ ] More regions: UK (LSE), Scandinavia, Asia
-- [ ] Historical yield charts per stock
-- [ ] CSV / JSON export of rankings
+- [ ] More regions: Asia (Nikkei, Hang Seng)
+- [ ] Real-time FX rates (currently a static approximation in `lib/fx.ts`)
 
 Please open an [issue](https://github.com/Vinyxsoftware/dividendwatch/issues) before starting large changes so we can discuss the approach.
 
